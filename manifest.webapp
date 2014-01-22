@@ -1,0 +1,15 @@
+{
+	"launch_path":"/index.html",
+	"installs_allowed_from":["*"],
+	"version":"0.0.1",
+	"name":"FirefoxOS-Cordova",
+	"pkgName":"io.cordova.hellocordova",
+	"type": "privileged",
+	"permissions": {
+    		"geolocation": {
+      			"description": "Marking out user location"
+    		},
+    		"contacts":
+				{ "access": "readwrite", "description": "testing" }
+  	}
+}
