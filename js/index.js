@@ -107,7 +107,25 @@ var app = {
         app.receivedEvent('deviceready');
     },
     // Update DOM on a Received Event
-    receivedEvent: function (id) {
+    receivedEvent: function(id) {
+
+        function flip() {
+            var flipbox = document.querySelector('x-flipbox');
+            var back = flipbox.querySelector('div:last-child');
+            back.innerHTML ='<button class="back">back</button>';
+            flipbox.toggle();
+
+            back.querySelector('button.back').addEventListener('click', function() {
+                flipbox.toggle();
+            });
+        }
+
+        function appendToOutput(el) {
+            var flipbox = document.querySelector('x-flipbox');
+            var back = flipbox.querySelector('div:last-child');
+            back.appendChild(el);
+        };
+
         var parentElement = document.getElementById(id);
         var listeningElement = parentElement.querySelector('.listening');
         var receivedElement = parentElement.querySelector('.received');
@@ -115,22 +133,15 @@ var app = {
         receivedElement.setAttribute('style', 'display:block;');
         console.log('Received Event: ' + id);
 
-        function getPicture() {
-            function showImage(imgSrc) {
-                var img = document.createElement('img');
-                img.id = 'slide';
-                img.src = imgSrc;
-                document.body.appendChild(img);
-                img.addEventListener('click', function () {
-                    this.parentNode.removeChild(this);
-                });
-            }
-
-            function _blank() {};
-            navigator.camera.getPicture(showImage, _blank, {
-                destinationType: 1
-            });
-        }
+ 		function getPicture() {
+		    navigator.camera.getPicture(function(src) {
+                flip();
+			    var img = document.createElement('img');
+			    img.id = 'slide';
+			    img.src = src;
+			    appendToOutput(img);
+            }, function() {}, {destinationType: 1});
+		}
 
         function getAccel() {
             console.log("here");
@@ -388,8 +399,54 @@ var app = {
             function onError(contactError) {
                 alert('onError!');
                 switchView();
+            }		
+		}
+		function addNewContact(){
+			document.getElementById("mainHTML").style.display="none"; 
+			canvas = document.getElementById('contactForm');
+			canvas.style.display="block";		
+		}
+		
+		
+		var button = document.getElementById('getPicture');
+		button.addEventListener('click', getPicture, false);        
+		button = document.getElementById('getAccel');
+		button.addEventListener('click', getAccel, false);
+		button = document.getElementById('runAccel');
+		button.addEventListener('click', runAccel, false);
+		button = document.getElementById('runGeo');
+		button.addEventListener('click', runGeo, false);
+		button = document.getElementById('runCompass');
+		button.addEventListener('click', runCompass, false);
+		button = document.getElementById('runPro');
+		button.addEventListener('click', runPro, false);
+		button = document.getElementById('addNewContact');
+		button.addEventListener('click', addNewContact, false);		
+		button1 = document.getElementById('ccontact');
+		button1.addEventListener('click', cancelContact, false);
+		button2 = document.getElementById('scontact');
+		button2.addEventListener('click', saveContact, false);
+
+		function switchView(){
+			document.getElementById("mainHTML").style.display="block"; 
+			canvas = document.getElementById('myMotionCanvas');
+			canvas.style.display="none";
+			cancelAnimationFrame( frameID );
+			canvas = document.getElementById('myCompassCanvas');
+			canvas.style.display="none";
+			canvas = document.getElementById('contactForm');
+			canvas.style.display="none";			
+			
+        	if (watchID) {
+            	navigator.compass.clearWatch(watchID);
+            	watchID = null;
+        	}
+		}
+		document.addEventListener('touchend', function(event) {	
+			if( document.getElementById("mainHTML").style.display == "none"  && document.getElementById("contactForm").style.display == "none"){
+            	setTimeout(switchView, 500);
             }
-        }
+        })
 
         function addNewContact() {
             document.getElementById("mainHTML").style.display = "none";
