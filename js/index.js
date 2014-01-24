@@ -109,6 +109,23 @@ var app = {
     },
     // Update DOM on a Received Event
     receivedEvent: function(id) {
+        function flip() {
+            var flipbox = document.querySelector('x-flipbox');
+            var back = flipbox.querySelector('div:last-child');
+            back.innerHTML ='<button class="back">back</button>';
+            flipbox.toggle();
+
+            back.querySelector('button.back').addEventListener('click', function() {
+                flipbox.toggle();
+            });
+        }
+
+        function appendToOutput(el) {
+            var flipbox = document.querySelector('x-flipbox');
+            var back = flipbox.querySelector('div:last-child');
+            back.appendChild(el);
+        };
+
         var parentElement = document.getElementById(id);
         var listeningElement = parentElement.querySelector('.listening');
         var receivedElement = parentElement.querySelector('.received');
@@ -117,17 +134,13 @@ var app = {
         console.log('Received Event: ' + id);
 
  		function getPicture() {
-			function showImage(imgSrc) {
-				var img = document.createElement('img');
-				img.id = 'slide';
-				img.src = imgSrc;
-				document.body.appendChild(img);
-				img.addEventListener('click', function() {
-					this.parentNode.removeChild(this);
-				});
-			}
-			function _blank() {};
-			navigator.camera.getPicture(showImage, _blank, {destinationType: 1});
+		    navigator.camera.getPicture(function(src) {
+                flip();
+			    var img = document.createElement('img');
+			    img.id = 'slide';
+			    img.src = src;
+			    appendToOutput(img);
+            }, function() {}, {destinationType: 1});
 		}
 
 		function getAccel(){
@@ -412,7 +425,7 @@ var app = {
 		button1.addEventListener('click', cancelContact, false);
 		button2 = document.getElementById('scontact');
 		button2.addEventListener('click', saveContact, false);
-				
+
 		function switchView(){
 			document.getElementById("mainHTML").style.display="block"; 
 			canvas = document.getElementById('myMotionCanvas');
