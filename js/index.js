@@ -343,12 +343,12 @@ var app = {
 
             function onSuccess(contact) {
                 console.log("Save Success");
-                switchView();
+                flip();
             };
 
             function onError(contactError) {
                 console.log("Add Error = " + contactError.code);
-                switchView();
+                flip();
             };
 
             // create a new contact object
@@ -369,10 +369,6 @@ var app = {
 
         }
 
-        function cancelContact() {
-            switchView();
-        }
-
         function saveContact() {
             var options = new ContactFindOptions();
             options.filter = "";
@@ -388,7 +384,7 @@ var app = {
                     console.log("Name = " + contacts[i].name.givenName + "," + contacts[i].name.familyName + " emails " + contacts[i].emails);
                     if (contacts[i].name.givenName == fname && contacts[i].name.familyName == lname) {
                         console.log("name already added");
-                        switchView();
+                        flip();
                         return;
                     }
 
@@ -400,15 +396,18 @@ var app = {
 
             function onError(contactError) {
                 alert('onError!');
-                switchView();
+                flip();
             }		
 		}
 		function addNewContact(){
-			document.getElementById("mainHTML").style.display="none"; 
-			var form = document.getElementById('contactForm');
-			form.style.display="block";		
+            flip();
+            var back = document.querySelector('x-flipbox div:last-child');
+			var form = document.querySelector('.contactForm').cloneNode(true);
+            back.appendChild(form);
+
+		    var button2 = document.querySelector('x-flipbox .contactForm .save');
+		    button2.addEventListener('click', saveContact, false);
 		}
-		
 		
 		var button = document.getElementById('getPicture');
 		button.addEventListener('click', getPicture, false);        
@@ -424,9 +423,5 @@ var app = {
 		button.addEventListener('click', runPro, false);
 		button = document.getElementById('addNewContact');
 		button.addEventListener('click', addNewContact, false);		
-		var button1 = document.getElementById('ccontact');
-		button1.addEventListener('click', cancelContact, false);
-		var button2 = document.getElementById('scontact');
-		button2.addEventListener('click', saveContact, false);
     }
 };

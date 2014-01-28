@@ -80,6 +80,10 @@ h1 {
     text-align:center;
 }
 
+body > .contactForm {
+    display: none;
+}
+
 .event {
     border-radius:4px;
     -webkit-border-radius:4px;
