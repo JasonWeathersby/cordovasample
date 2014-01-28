@@ -54,7 +54,21 @@ html, body {
 .app {
     text-align:center;
     height: 100%;
+    padding: 0;
+}
+
+x-flipbox > div {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+x-flipbox div:first-child {
     padding: 1em;
+}
+
+x-flipbox div:last-child {
+    padding-top: 1em;
 }
 
 h1 {

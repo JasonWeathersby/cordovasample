@@ -18,32 +18,31 @@
  */
 //Landscape vs Portrait
 window.onload = init;
-currY = 0;
-currY = 0;
-dX = 0;
-dY = 0;
-frameID = null;
-img = null;
-context = null;
-canvas = null;
-watchID = null;
-myHeading = 0;
-oCanvas = null;
+var currY = 0;
+var currY = 0;
+var dX = 0;
+var dY = 0;
+var img = null;
+var context = null;
+var canvas = null;
+var watchID = null;
+var myHeading = 0;
+var oCanvas = null;
 
 //Utility function for request animation
-requestAnimationFrame = (function () {
+var requestAnimationFrame = (function () {
     return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame
 })();
 
 //Utility function to cancel animation
-cancelAnimationFrame = (function () {
+var cancelAnimationFrame = (function () {
     return window.cancelAnimationFrame || window.mozCancelAnimationFrame;
 })();
 
 //This function just creates an offscreen canvas to hold a picture of the compass
 //background
 
-function offscreenCanvas() {
+function offscreenCanvas(img) {
     if (img != null && oCanvas == null) {
         var m_canvas = document.createElement('canvas');
         m_canvas.width = img.width;
@@ -115,6 +114,11 @@ var app = {
             back.innerHTML ='<button class="back">back</button>';
             flipbox.toggle();
 
+            if (watchID) {
+                navigator.compass.clearWatch(watchID);
+                watchID = null;
+            }
+
             back.querySelector('button.back').addEventListener('click', function() {
                 flipbox.toggle();
             });
@@ -160,8 +164,7 @@ var app = {
             }
         }
 
-        function handleMovement() {
-            frameID = requestAnimationFrame(handleMovement);
+        function handleMovement(context, img) {
             context.clearRect(currX, currY, 60, 60);
             currX += dX;
             currY += dY;
@@ -175,22 +178,24 @@ var app = {
         //Really Device Motion
 
         function runAccel() {
-            //alert("Dont Touch Me");
-            document.getElementById("mainHTML").style.display = "none";
-            canvas = document.getElementById('myMotionCanvas');
-            //canvas.style.backgroundColor = 'red';
-            canvas.style.display = "block";
-            canvas.height = window.innerHeight;
+            flip();
+            var back = document.querySelector('x-flipbox div:last-child');
+            canvas = document.createElement('canvas');
+            back.appendChild(canvas);
+
+            var rect = canvas.getBoundingClientRect();
+            
+            canvas.height = window.innerHeight - rect.top;
             canvas.width = window.innerWidth;
             context = canvas.getContext('2d');
             dX = 0;
             dY = 0;
             currX = canvas.width / 2;
             currY = canvas.height / 2;
-            img = new Image(); //create image object
+            var img = new Image(); //create image object
             img.onload = function () { //create our handler
-                context.drawImage(img, currX, currY); //when image finishes loading, draw it
-            }
+                context.drawImage(this, currX, currY); //when image finishes loading, draw it
+            };
             img.src = "img/accel.png";
 
             window.addEventListener('deviceorientation', function (eventData) {
@@ -203,8 +208,8 @@ var app = {
                 var gamma = Math.round(eventData.gamma);
                 dX = -(gamma / 360) * 100; //Math.cos((gamma/360)*Math.PI*2);
                 dY = -(beta / 360) * 100; //Math.cos((gamma/360)*Math.PI*2)*beta/7;
+                handleMovement(context, img);
             });
-            handleMovement(context);
         }
 
         function runGeo() {
@@ -219,9 +224,7 @@ var app = {
             navigator.geolocation.getCurrentPosition(onSuccess, onError);
         }
 
-        function runCompassUpdate() {
-            frameID = requestAnimationFrame(runCompassUpdate);
-
+        function runCompassUpdate(img) {
             context.clearRect(0, 0, canvas.width, canvas.height);
             var xStart = (canvas.width - img.width) / 2;
             var yStart = (canvas.height - img.height) / 2;
@@ -240,7 +243,6 @@ var app = {
         }
 
         function runCompass() {
-
             function onSuccess(heading) {
                 var element = document.getElementById('heading');
                 myHeading = (heading.magneticHeading).toFixed(2);
@@ -255,25 +257,25 @@ var app = {
             };
             watchID = navigator.compass.watchHeading(onSuccess, onError, options);
 
+            flip();
+            var back = document.querySelector('x-flipbox div:last-child');
+            canvas = document.createElement('canvas');
+            back.appendChild(canvas);
 
-
-            document.getElementById("mainHTML").style.display = "none";
-            canvas = document.getElementById('myCompassCanvas');
-            canvas.style.display = "block";
-            canvas.height = window.innerHeight;
+            var rect = canvas.getBoundingClientRect();
+            
+            canvas.height = window.innerHeight - rect.top;
             canvas.width = window.innerWidth;
             context = canvas.getContext('2d');
-            img = new Image(); //create image object
+            var img = new Image(); //create image object
             console.log("CH " + canvas.height + " CW " + canvas.width);
             img.onload = function () { //create our handler
                 var xStart = (canvas.width - img.width) / 2;
                 var yStart = (canvas.height - img.height) / 2;
-                offscreenCanvas();
-                runCompassUpdate();
-            }
+                offscreenCanvas(this);
+                runCompassUpdate(this);
+            };
             img.src = "img/cNeedle.png";
-
-
         }
 
 
@@ -403,8 +405,8 @@ var app = {
 		}
 		function addNewContact(){
 			document.getElementById("mainHTML").style.display="none"; 
-			canvas = document.getElementById('contactForm');
-			canvas.style.display="block";		
+			var form = document.getElementById('contactForm');
+			form.style.display="block";		
 		}
 		
 		
@@ -422,78 +424,9 @@ var app = {
 		button.addEventListener('click', runPro, false);
 		button = document.getElementById('addNewContact');
 		button.addEventListener('click', addNewContact, false);		
-		button1 = document.getElementById('ccontact');
+		var button1 = document.getElementById('ccontact');
 		button1.addEventListener('click', cancelContact, false);
-		button2 = document.getElementById('scontact');
+		var button2 = document.getElementById('scontact');
 		button2.addEventListener('click', saveContact, false);
-
-		function switchView(){
-			document.getElementById("mainHTML").style.display="block"; 
-			canvas = document.getElementById('myMotionCanvas');
-			canvas.style.display="none";
-			cancelAnimationFrame( frameID );
-			canvas = document.getElementById('myCompassCanvas');
-			canvas.style.display="none";
-			canvas = document.getElementById('contactForm');
-			canvas.style.display="none";			
-			
-        	if (watchID) {
-            	navigator.compass.clearWatch(watchID);
-            	watchID = null;
-        	}
-		}
-		document.addEventListener('touchend', function(event) {	
-			if( document.getElementById("mainHTML").style.display == "none"  && document.getElementById("contactForm").style.display == "none"){
-            	setTimeout(switchView, 500);
-            }
-        })
-
-        function addNewContact() {
-            document.getElementById("mainHTML").style.display = "none";
-            canvas = document.getElementById('contactForm');
-            canvas.style.display = "block";
-        }
-
-
-        var button = document.getElementById('getPicture');
-        button.addEventListener('click', getPicture, false);
-        button = document.getElementById('getAccel');
-        button.addEventListener('click', getAccel, false);
-        button = document.getElementById('runAccel');
-        button.addEventListener('click', runAccel, false);
-        button = document.getElementById('runGeo');
-        button.addEventListener('click', runGeo, false);
-        button = document.getElementById('runCompass');
-        button.addEventListener('click', runCompass, false);
-        button = document.getElementById('runPro');
-        button.addEventListener('click', runPro, false);
-        button = document.getElementById('addNewContact');
-        button.addEventListener('click', addNewContact, false);
-        button1 = document.getElementById('ccontact');
-        button1.addEventListener('click', cancelContact, false);
-        button2 = document.getElementById('scontact');
-        button2.addEventListener('click', saveContact, false);
-
-        function switchView() {
-            document.getElementById("mainHTML").style.display = "block";
-            canvas = document.getElementById('myMotionCanvas');
-            canvas.style.display = "none";
-            cancelAnimationFrame(frameID);
-            canvas = document.getElementById('myCompassCanvas');
-            canvas.style.display = "none";
-            canvas = document.getElementById('contactForm');
-            canvas.style.display = "none";
-
-            if (watchID) {
-                navigator.compass.clearWatch(watchID);
-                watchID = null;
-            }
-        }
-        document.addEventListener('touchend', function (event) {
-            if (document.getElementById("mainHTML").style.display == "none" && document.getElementById("contactForm").style.display == "none") {
-                setTimeout(switchView, 500);
-            }
-        }, false);
-
     }
 };
