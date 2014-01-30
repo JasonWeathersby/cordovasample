@@ -13,55 +13,59 @@
     Unless required by applicable law or agreed to in writing,
     software distributed under the License is distributed on an
     "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-     KIND, either express or implied.  See the License for the
+    KIND, either express or implied.  See the License for the
     specific language governing permissions and limitations
     under the License.
--->
+  -->
 <html>
-    <head>
-        <meta charset="utf-8" />
-        <meta name="format-detection" content="telephone=no" />
-        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
-        <link rel="stylesheet" type="text/css" href="css/brick-0.9.2.min.css" />
-        <link rel="stylesheet" type="text/css" href="css/index.css" />
-        <link rel="stylesheet" type="text/css" href="css/background.css" />
-        <link rel="stylesheet" type="text/css" href="css/notification.css" />        
-        <title>Firefox OS - Cordova Test App</title>
-   
-    </head>
-    <body>
-        <div class="app">
-          <x-flipbox>
-        	<div id="mainHTML">
-              <h1>Cordova/Firefox OS</h1>
-              <div id="deviceready" class="blink">
-                <p class="event listening">Connecting to Device</p>
-                <p class="event received">Device is Ready</p>
-              </div>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
+    <link rel="stylesheet" type="text/css" href="css/brick-0.10.0.css" />
+    <link rel="stylesheet" type="text/css" href="css/index.css" />
+    <link rel="stylesheet" type="text/css" href="css/background.css" />
+    <link rel="stylesheet" type="text/css" href="css/notification.css" />
+    <title>Firefox OS - Cordova Test App</title>
 
-              <button id="getPicture">Get Picture</button>
-              <div id="addcontact"><button id="runPro">Prompt/Vibrate</button></div>                 	
-              <button id="getAccel">Display Accelerometer</button>
-              <button id="runAccel">Run Device Motion</button>
-              <button id="runGeo">Geolocation</button>
-              <button id="runCompass">Compass</button>
-              <button id="addNewContact">Add Contact</button>
+  </head>
+  <body>
+    <x-layout>
+      <header>
+        <x-appbar><header>Cordova <3 Firefox OS</header></x-appbar>
+      </header>
+      <section>
+        <x-flipbox>
+          <div>
+            <div id="deviceready" class="blink">
+              <p class="event listening">Connecting to Device</p>
+              <p class="event received">Device is Ready</p>
             </div>
-            <div>
-              <button class="back">back</button>
-            </div>
-          </x-flipbox>
-        </div>
 
-        <div class="contactForm">
-        	First Name: <input type="text" id="fname">
-        	Last name: <input type="text" id="lname">
-        	E-mail: <input type="email" id="email">
-        	<button class="save">Save</button>  
-        </div>       
-        <script type="text/javascript" src="js/brick-0.10.0.min.js"></script>
-        <script type="text/javascript" src="cordova.js"></script>
-        <script type="text/javascript" src="js/index.js"></script>
+            <button id="getPicture">Get Picture</button>
+            <div id="addcontact"><button id="runPro">Prompt/Vibrate</button></div>
+            <button id="getAccel">Display Accelerometer</button>
+            <button id="runAccel">Run Device Motion</button>
+            <button id="runGeo">Geolocation</button>
+            <button id="runCompass">Compass</button>
+            <button id="addNewContact">Add Contact</button>
+          </div>
+          <div>
+            <button class="back">back</button>
+          </div>
+        </x-flipbox>
+      </section>
+    </x-layout>
 
-    </body>
+    <div class="contactForm">
+      First Name: <input type="text" id="fname">
+      Last name: <input type="text" id="lname">
+      E-mail: <input type="email" id="email">
+      <button class="save">Save</button>
+    </div>
+
+    <script type="text/javascript" src="js/brick-0.10.0.min.js"></script>
+    <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="js/index.js"></script>
+  </body>
 </html>
