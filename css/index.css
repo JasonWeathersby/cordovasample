@@ -114,6 +114,10 @@ body > .contactForm {
     50% { opacity: 0.4; }
     to { opacity: 1.0; }
 }
+
+#deviceready {
+    display: none;
+}
  
 .blink {
     animation:fade 3000ms infinite;

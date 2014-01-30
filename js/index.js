@@ -144,13 +144,18 @@ var app = {
     // Update DOM on a Received Event
     receivedEvent: function (id) {
 
-        function flip() {
+        function flipDemo(title) {
             var flipbox = document.querySelector('x-flipbox');
+            var appbar = document.querySelector('x-appbar');
             var back = flipbox.querySelector('div:last-child');
+
             back.innerHTML = '<button class="back">back</button>';
-            flipbox.toggle();
+            appbar.heading = title;
+            flipbox.showBack();
+
             back.querySelector('button.back').addEventListener('click', function () {
-                flipbox.toggle();
+                flipMain();
+
                 if (frameID != null) {
                     cancelAnimationFrame(frameID);
                     frameID = null;
@@ -169,6 +174,13 @@ var app = {
             });
         }
 
+        function flipMain() {
+            var flipbox = document.querySelector('x-flipbox');
+            var appbar = document.querySelector('x-appbar');
+            flipbox.showFront();
+            appbar.heading = 'Cordova <3 Firefox OS';
+        }
+      
         function appendToOutput(el) {
             var flipbox = document.querySelector('x-flipbox');
             var back = flipbox.querySelector('div:last-child');
@@ -184,7 +196,7 @@ var app = {
 
         function getPicture() {
             navigator.camera.getPicture(function (src) {
-                flip();
+                flipDemo('Picture');
                 var img = document.createElement('img');
                 img.id = 'slide';
                 img.src = src;
@@ -195,7 +207,7 @@ var app = {
         }
 
         function getAccel() {
-            flip();
+            flipDemo('Accelerometer');
             var back = document.querySelector('x-flipbox div:last-child');
             var myFrontImage = document.createElement('img');
             myFrontImage.src = "img/cardfront.png";
@@ -346,7 +358,7 @@ var app = {
         }
 
         function runAccel() {
-            flip();
+            flipDemo('Accelerometer');
             var back = document.querySelector('x-flipbox div:last-child');
             canvas = document.createElement('canvas');
             back.appendChild(canvas);
@@ -402,7 +414,7 @@ var app = {
         }
 
         function runCompass() {
-            flip();
+            flipDemo('Compass');
 
             function onSuccess(heading) {
                 var element = document.getElementById('heading');
@@ -491,12 +503,12 @@ var app = {
 
             function onSuccess(contact) {
                 console.log("Save Success");
-                flip();
+                flipMain();
             };
 
             function onError(contactError) {
                 console.log("Add Error = " + contactError.code);
-                flip();
+                flipMain();
             };
 
             // create a new contact object
@@ -532,7 +544,7 @@ var app = {
                     console.log("Name = " + contacts[i].name.givenName + "," + contacts[i].name.familyName + " emails " + contacts[i].emails);
                     if (contacts[i].name.givenName == fname && contacts[i].name.familyName == lname) {
                         console.log("name already added");
-                        flip();
+                        flipMain();
                         return;
                     }
 
@@ -544,12 +556,12 @@ var app = {
 
             function onError(contactError) {
                 alert('onError!');
-                flip();
+                flipMain();
             }
         }
 
         function addNewContact() {
-            flip();
+            flipMain();
             var back = document.querySelector('x-flipbox div:last-child');
             var form = document.querySelector('.contactForm').cloneNode(true);
             back.appendChild(form);
