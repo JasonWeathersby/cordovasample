@@ -213,12 +213,12 @@ var app = {
             newflip.appendChild(bck);
             back.appendChild(newflip);
 
-            /*var vals = document.createElement('div');
+            var vals = document.createElement('div');
             vals.setAttribute("id", "accvals");
             vals.style.position = "absolute";
             vals.style.left = "100px";
             vals.style.top = "350px";
-            back.appendChild(vals);*/
+            back.appendChild(vals);
             var options = {
                 frequency: 100
             };
@@ -274,7 +274,7 @@ var app = {
 						myTimer=setInterval(function(){delayTimer()},2000);                        
                     }
 
-                }    */             
+                }                
                 if (acY > 5 && !accelDelay) {
                     var f = document.getElementById("playcard");
                     if (f != null) {
