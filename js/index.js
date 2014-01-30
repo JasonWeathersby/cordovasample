@@ -139,6 +139,7 @@ var app = {
     // function, we must explicity call 'app.receivedEvent(...);'
     onDeviceReady: function () {
         app.receivedEvent('deviceready');
+        window.screen.mozLockOrientation('portrait-primary');
     },
     // Update DOM on a Received Event
     receivedEvent: function (id) {
