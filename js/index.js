@@ -32,6 +32,7 @@ var bCanvas = null;
 var frameID = null;
 var watchIDAccel = null;
 var ballRadius = 20;
+var accelDelay=false;
 
 //Utility function for request animation
 var requestAnimationFrame = (function () {
@@ -212,12 +213,12 @@ var app = {
             newflip.appendChild(bck);
             back.appendChild(newflip);
 
-            var vals = document.createElement('div');
+            /*var vals = document.createElement('div');
             vals.setAttribute("id", "accvals");
             vals.style.position = "absolute";
             vals.style.left = "100px";
             vals.style.top = "350px";
-            back.appendChild(vals);
+            back.appendChild(vals);*/
             var options = {
                 frequency: 100
             };
@@ -226,22 +227,66 @@ var app = {
 
             navigator.accelerometer.getCurrentAcceleration(onSuccess, onError);
 
+
             function onSuccess(acceleration) {
+
+            	var myTimer = null;
+				function delayTimer(){
+					accelDelay=false;
+					clearInterval(myTimer);
+				}
+
                 var acX = acceleration.x.toFixed(1) * -1;
                 var acY = acceleration.y.toFixed(1);
                 var acZ = acceleration.z.toFixed(1);
                 var vals = document.getElementById('accvals');
                 var accelstr = "<strong>Accel X: </strong>" + acX + "<br>" + "<strong>Accel Y: </strong>" + acY + "<br>" + "<strong>Accel Z: </strong>" + acZ;
                 vals.innerHTML = accelstr;
-                if (acX > 5) {
+               if (acX > 5 && !accelDelay) {
                     var f = document.getElementById("playcard");
                     if (f != null) {
                         //direction does not appear to work
-                        //f.direction ="right";
+                        f.direction ="right";
                         f.toggle();
+                        accelDelay=true;
+						myTimer=setInterval(function(){delayTimer()},2000);
                     }
 
                 }
+                if (acX < -5 && !accelDelay) {
+                    var f = document.getElementById("playcard");
+                    if (f != null) {
+                        //direction does not appear to work
+                        f.direction ="left";
+                        f.toggle();
+                        accelDelay=true;
+						myTimer=setInterval(function(){delayTimer()},2000);                        
+                    }
+
+                }
+                if (acY < -5 && !accelDelay) {
+                    var f = document.getElementById("playcard");
+                    if (f != null) {
+                        //direction does not appear to work
+                        f.direction ="up";
+                        f.toggle();
+                        accelDelay=true;
+						myTimer=setInterval(function(){delayTimer()},2000);                        
+                    }
+
+                }    */             
+                if (acY > 5 && !accelDelay) {
+                    var f = document.getElementById("playcard");
+                    if (f != null) {
+                        //direction does not appear to work
+                        f.direction ="down";
+                        f.toggle();
+                        accelDelay=true;
+						myTimer=setInterval(function(){delayTimer()},4000);                        
+                    }
+
+                }                 
+                
             }
             // onError: Failed to get the acceleration
             //
