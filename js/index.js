@@ -23,6 +23,7 @@ var currY = 0;
 var dX = 0;
 var dY = 0;
 var img = null;
+var gImg = null;
 var context = null;
 var canvas = null;
 var watchID = null;
@@ -452,10 +453,10 @@ var app = {
             context.translate(canvas.width / 2, canvas.height / 2);
             context.rotate(myrads);
             context.translate(-img.width / 2, -img.height / 2);
-            context.drawImage(img, 0, 0);
-            console.log("Drawing Needle");
+            context.drawImage(img, 0, 5, img.width, img.height-5);
+            //console.log("Drawing Needle");
             context.restore();
-
+            context.drawImage(gImg, canvas.width / 2 - img.width / 2, canvas.height / 2 - img.height / 2);
         }
 
         function runCompass() {
@@ -487,6 +488,8 @@ var app = {
             canvas.height = window.innerHeight - rect.top;
             canvas.width = window.innerWidth;
             context = canvas.getContext('2d');
+            gImg = new Image();
+            gImg.src = "img/glass.png";
             img = new Image(); //create image object
             console.log("CH " + canvas.height + " CW " + canvas.width);
             img.onload = function () { //create our handler
