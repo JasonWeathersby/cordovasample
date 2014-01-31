@@ -147,22 +147,27 @@ DAT.Globe = function(container, colorFn) {
     renderer.domElement.style.position = 'absolute';
 
     container.appendChild(renderer.domElement);
-
-    container.addEventListener('mousedown', onMouseDown, false);
-
-    container.addEventListener('mousewheel', onMouseWheel, false);
-
-    document.addEventListener('keydown', onDocumentKeyDown, false);
-
     window.addEventListener('resize', onWindowResize, false);
+    var supportsTouch = ('ontouchstart' in window) ||
+        window.DocumentTouch &&
+        document instanceof DocumentTouch;
+    if (supportsTouch) {
+        //container.ontouchstart = onTouch;
+        container.addEventListener('touchstart', onTouch, false);
+        console.log("Added touch startevent");
+	}else{
+    
+    	container.addEventListener('mousedown', onMouseDown, false);
+    	container.addEventListener('mousewheel', onMouseWheel, false);
+    	document.addEventListener('keydown', onDocumentKeyDown, false);
 
-    container.addEventListener('mouseover', function() {
-      overRenderer = true;
-    }, false);
-
-    container.addEventListener('mouseout', function() {
-      overRenderer = false;
-    }, false);
+    	container.addEventListener('mouseover', function() {
+      		overRenderer = true;
+    	}, false);
+    	container.addEventListener('mouseout', function() {
+      	overRenderer = false;
+    	}, false);
+    }	
   }
 
   addData = function(data, opts) {
@@ -269,6 +274,42 @@ DAT.Globe = function(container, colorFn) {
     THREE.GeometryUtils.merge(subgeo, point);
   }
 
+  function onTouch(event) {
+    console.log("in OnTouch");
+    event.preventDefault();
+
+    container.addEventListener('touchmove', onTouchMove, false);
+    container.addEventListener('touchend', onTouchUp, false);
+
+	
+    mouseOnDown.x = - event.targetTouches[0].clientX;
+    mouseOnDown.y = event.targetTouches[0].clientY;
+
+    targetOnDown.x = target.x;
+    targetOnDown.y = target.y;
+
+    container.style.cursor = 'move';
+  }
+
+  function onTouchMove(event) {
+    mouse.x = - event.targetTouches[0].clientX;;
+    mouse.y = event.targetTouches[0].clientY;
+
+    var zoomDamp = distance/1000;
+
+    target.x = targetOnDown.x + (mouse.x - mouseOnDown.x) * 0.005 * zoomDamp;
+    target.y = targetOnDown.y + (mouse.y - mouseOnDown.y) * 0.005 * zoomDamp;
+
+    target.y = target.y > PI_HALF ? PI_HALF : target.y;
+    target.y = target.y < - PI_HALF ? - PI_HALF : target.y;
+  }
+  function onTouchUp(event) {
+    container.removeEventListener('touchmove', onMouseMove, false);
+    container.removeEventListener('touchend', onMouseUp, false);
+    container.style.cursor = 'auto';
+  }
+  
+  
   function onMouseDown(event) {
     event.preventDefault();
 
@@ -361,7 +402,8 @@ DAT.Globe = function(container, colorFn) {
     camera.position.z = distance * Math.cos(rotation.x) * Math.cos(rotation.y);
 
     camera.lookAt(mesh.position);
-
+	//console.log( "target.x " + target.x + " target.y " + target.y);
+	//console.log( "cam x " +  camera.position.x + " cam y " + camera.position.y + " cam z " + camera.position.z);
     renderer.render(scene, camera);
   }
 
