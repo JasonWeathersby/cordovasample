@@ -429,9 +429,30 @@ var app = {
         }
 
         function runGeo() {
+        	flipDemo('Geolocation');
+ 			//need a loading message
+
             var onSuccess = function (position) {
-                alert('Latitude: ' + position.coords.latitude + '\n' + 'Longitude: ' + position.coords.longitude + '\n' + 'Altitude: ' + position.coords.altitude + '\n' + 'Accuracy: ' + position.coords.accuracy + '\n' + 'Altitude Accuracy: ' + position.coords.altitudeAccuracy + '\n' + 'Heading: ' + position.coords.heading + '\n' + 'Speed: ' + position.coords.speed + '\n' + 'Timestamp: ' + position.timestamp + '\n');
-            };
+                console.log('Latitude: ' + position.coords.latitude + '\n' + 'Longitude: ' + position.coords.longitude + '\n');
+            	var back = document.querySelector('x-flipbox div:last-child');
+            	var mapdiv = document.createElement('div');
+            	back.appendChild(mapdiv);
+            	mapdiv.setAttribute('id', 'map');
+            
+            	mapdiv.style.height="300px"
+            	mapdiv.style.width= "320px";
+	
+ 	        	var globe = new DAT.Globe(mapdiv);
+
+      			console.log(globe);
+      			var pt = new THREE.Geometry();
+      		
+      			//var data = [53.795,-1.53,2,2];
+      			var geodata = [position.coords.latitude, position.coords.longitude, 2, 2];
+      			globe.addData(geodata, {format: 'magnitude', animated: false});  
+      			globe.createPoints();               
+	        	globe.animate();            
+            }
 
             function onError(error) {
                 alert('code: ' + error.code + '\n' + 'message: ' + error.message + '\n');

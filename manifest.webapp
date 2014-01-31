@@ -3,7 +3,12 @@
 	"installs_allowed_from":["*"],
 	"version":"0.0.1",
 	"name":"FirefoxOS-Cordova",
-	"pkgName":"io.cordova.hellocordova",
+	"description":"Firefox OS Sample Cordova App",
+    "developer": {
+        "name": "James Long and Jason Weathersby",
+        "url": "http://www.mozilla.com"
+    },	
+	
 	"type": "privileged",
 	"permissions": {
     		"geolocation": {
