@@ -57,6 +57,10 @@ html, body {
     padding: 0;
 }
 
+x-flipbox {
+    overflow: hidden;
+}
+
 x-flipbox > div {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
