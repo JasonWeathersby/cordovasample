@@ -630,7 +630,7 @@ var app = {
         }
 
         function addNewContact() {
-            flipMain();
+            flipDemo('Contact');
             var back = document.querySelector('x-flipbox div:last-child');
             var form = document.querySelector('.contactForm').cloneNode(true);
             back.appendChild(form);
