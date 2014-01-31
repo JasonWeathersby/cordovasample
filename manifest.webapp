@@ -8,7 +8,12 @@
         "name": "James Long and Jason Weathersby",
         "url": "http://www.mozilla.com"
     },	
-	
+	"icons": {
+        "16": "/img/icon-16.png",
+        "48": "/img/icon-48.png",
+        "60": "/img/icon-60.png",
+        "128": "/img/icon-128.png"
+    },
 	"type": "privileged",
 	"permissions": {
     		"geolocation": {
