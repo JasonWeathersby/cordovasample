@@ -149,13 +149,15 @@ var app = {
         function flipDemo(title) {
             var flipbox = document.querySelector('x-flipbox');
             var appbar = document.querySelector('x-appbar');
-            var back = flipbox.querySelector('div:last-child');
+            var back = appbar.querySelector('.back');
+            var backside = flipbox.querySelector('div:last-child');
 
-            back.innerHTML = '<button class="back">back</button>';
+            back.classList.add('open');
+            backside.innerHTML = '';
             appbar.heading = title;
             flipbox.showBack();
 
-            back.querySelector('button.back').addEventListener('click', function () {
+            back.addEventListener('click', function () {
                 flipMain();
 
                 if (frameID != null) {
@@ -170,16 +172,20 @@ var app = {
                     navigator.accelerometer.clearWatch(watchIDAccel);
                     watchIDAccel = null;
                 }
-                back.innerHTML = '<button class="back">back</button>';
+
                 window.removeEventListener('deviceorientation', deviceOrientationEvent);
-                console.log("Removed deviceorienation event");
             });
         }
 
         function flipMain() {
             var flipbox = document.querySelector('x-flipbox');
             var appbar = document.querySelector('x-appbar');
+            var back = appbar.querySelector('.back');
+            var backside = flipbox.querySelector('div:last-child');
             flipbox.showFront();
+
+            back.classList.remove('open');
+            backside.innerHTML = '';
             appbar.heading = 'Cordova <3 Firefox OS';
         }
       
