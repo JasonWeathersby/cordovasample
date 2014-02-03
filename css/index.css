@@ -57,8 +57,9 @@ html, body {
     padding: 0;
 }
 
-x-flipbox {
-    overflow: hidden;
+/* fix odd scrolling behavior when it's absolutely positioned */
+x-layout section :only-child {
+    position: relative;
 }
 
 x-flipbox > div {
@@ -67,11 +68,11 @@ x-flipbox > div {
     box-sizing: border-box;
 }
 
-x-flipbox div:first-child {
+x-flipbox > div:first-child {
     padding: 1em;
 }
 
-x-flipbox div:last-child {
+x-flipbox > div:last-child {
     padding-top: 1em;
 }
 
@@ -86,6 +87,15 @@ h1 {
 
 body > .contactForm {
     display: none;
+}
+
+.contactForm {
+    padding: 2em;
+    padding-top: 1em;
+}
+
+.contactForm .field {
+    margin-bottom: 1em;
 }
 
 .event {
@@ -129,7 +139,7 @@ body > .contactForm {
     margin: 1em 0;
 }
 
-button{
+section button {
 	line-height: 2.5;
 	display: block;
 	width: 75%;
@@ -138,4 +148,15 @@ button{
 
 #slide {
     max-width: 100%;
+}
+
+x-appbar button.back {
+    position: absolute;
+    top: 0;
+    left: .5em;
+    display: none;
+}
+
+x-appbar button.back.open {
+    display: block;
 }

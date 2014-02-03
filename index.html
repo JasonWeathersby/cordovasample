@@ -34,7 +34,10 @@
   <body>
     <x-layout>
       <header>
-        <x-appbar><header>Cordova <3 Firefox OS</header></x-appbar>
+        <x-appbar>
+          <button class="back">back</button>
+          <header>Cordova &lt;3 Firefox OSSSS</header>
+        </x-appbar>
       </header>
       <section>
         <x-flipbox>
@@ -52,18 +55,22 @@
             <button id="runCompass">Compass</button>
             <button id="addNewContact">Add Contact</button>
           </div>
-          <div>
-            <button class="back">back</button>
-          </div>
+          <div></div>
         </x-flipbox>
       </section>
     </x-layout>
 
  
     <div class="contactForm">
-      First Name: <input type="text" id="fname">
-      Last name: <input type="text" id="lname">
-      E-mail: <input type="email" id="email">
+      <div class="field">
+        First Name: <input type="text" id="fname">
+      </div>
+      <div class="field">
+        Last name: <input type="text" id="lname">
+      </div>
+      <div class="field">
+        E-mail: <input type="email" id="email">
+      </div>
       <button class="save">Save</button>
     </div>
 
