@@ -33,8 +33,9 @@ var bCanvas = null;
 var frameID = null;
 var watchIDAccel = null;
 var ballRadius = 20;
-var accelDelay=false;
+var accelDelay = false;
 
+var ptArray = [];
 //Utility function for request animation
 var requestAnimationFrame = (function () {
     return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame
@@ -168,7 +169,7 @@ var app = {
             back.classList.remove('open');
             appbar.heading = 'Cordova <3 Firefox OS';
         }
-      
+
         function appendToOutput(el) {
             var flipbox = document.querySelector('x-flipbox');
             var back = flipbox.querySelector('div:last-child');
@@ -213,7 +214,7 @@ var app = {
             });
         }
 
-        function getAccel() {
+        /*function getAccel() {
             flipDemo('Accelerometer');
             var back = document.querySelector('x-flipbox div:last-child');
             var myFrontImage = document.createElement('img');
@@ -312,52 +313,73 @@ var app = {
             function onError() {
                 alert('onError!');
             }
-        }
-        /* function getAccel() {    
-            flip();
+        }*/
+        function getAccel() {
+            flipDemo('Accelerometer');
+
             var back = document.querySelector('x-flipbox div:last-child');
             canvas = document.createElement('canvas');
             back.appendChild(canvas);
 
             var rect = canvas.getBoundingClientRect();
-            
+
             canvas.height = window.innerHeight - rect.top;
             canvas.width = window.innerWidth;
             context = canvas.getContext('2d');
             currX = canvas.width / 2;
-            currY = canvas.height / 2;        
-        
-			var options = { frequency: 100 };  
-			watchIDAccel = navigator.accelerometer.watchAcceleration(onSuccess, onError, options);        
-        
-            console.log("here");
+            currY = canvas.height / 2;
+
+            var options = {
+                frequency: 100
+            };
+            watchIDAccel = navigator.accelerometer.watchAcceleration(onSuccess, onError, options);
+
             navigator.accelerometer.getCurrentAcceleration(onSuccess, onError);
 
+            function drawLines() {
+                context.clearRect(0, 53, canvas.width, canvas.height - 53);
+                if (ptArray.length > 1) {
+                    for (var ii = 0; ii < ptArray.length; ii++) {
+                        context.beginPath();
+                        context.moveTo(ptArray[ii][0], ptArray[ii][1]);
+                        if ((ii + 1) < ptArray.length) {
+                            context.lineTo(ptArray[(ii + 1)][0], ptArray[(ii + 1)][1]);
+                            context.lineWidth = 3.5;
+                            context.strokeStyle = 'rgba(230,186,124,0.9)';
+                            context.stroke();
+                        }
+                    }
+                }
+
+            }
+
             function onSuccess(acceleration) {
-            	var acX = acceleration.x.toFixed(1)*-1;
-          		var acY = acceleration.y.toFixed(1);
-          		var acZ = acceleration.z.toFixed(1);
-          		context.clearRect(10, 0, canvas.width/2, 50);
-				context.fillStyle="white";
-				context.font="16px Arial";
-				context.fillText("Accel X " + acX,10,20);
-				context.fillText("Accel Y " + acY,10,35);
-				context.fillText("Accel Z " + acZ,10,50);          		
-          		if( (Math.abs(parseFloat(acX)) > 5) || (Math.abs(parseFloat(acY)) > 5) ){
-                 console.log('Acceleration X: ' + acX + '\n' + 'Acceleration Y: ' + acY + '\n' + 'Acceleration Z: ' + acZ + '\n' + 'Timestamp: ' + acceleration.timestamp + '\n');
-          		 context.beginPath();
-      			 context.moveTo(currX, currY);
-      			 context.lineTo(currX+parseInt(acX), currY+parseInt(acY));
-      			 context.lineWidth = 3.5;
-                 context.strokeStyle = 'rgba(255,0,0,0.9)';
-                 context.stroke(); 
-                 currX += parseInt(acX);
-                 currY += parseInt(acY);
-                 if( currX > canvas.width )currX=canvas.width;
-                 if( currY > canvas.height )currX=canvas.height;
-                 if( currX < 0 )currX=0;
-                 if( currY < 55 )currY=55;
-                 
+                var acX = acceleration.x.toFixed(1) * -1;
+                var acY = acceleration.y.toFixed(1);
+                var acZ = acceleration.z.toFixed(1);
+                context.clearRect(10, 0, canvas.width / 2, 50);
+                context.fillStyle = "white";
+                context.font = "16px Arial";
+                context.fillText("Accel X " + acX, 10, 20);
+                context.fillText("Accel Y " + acY, 10, 35);
+                context.fillText("Accel Z " + acZ, 10, 50);
+                if ((Math.abs(parseFloat(acX)) > 5) || (Math.abs(parseFloat(acY)) > 5)) {
+                    console.log('Acceleration X: ' + acX + '\n' + 'Acceleration Y: ' + acY + '\n' + 'Acceleration Z: ' + acZ + '\n' + 'Timestamp: ' + acceleration.timestamp + '\n');
+
+                    currX += parseInt(acX);
+                    currY += parseInt(acY);
+                    var coord = [];
+                    coord[0] = currX;
+                    coord[1] = currY;
+                    var len = ptArray.push(coord);
+                    if (len >= 15) ptArray.shift();
+
+                    if (currX > canvas.width) currX = canvas.width;
+                    if (currY > canvas.height) currX = canvas.height;
+                    if (currX < 0) currX = 0;
+                    if (currY < 65) currY = 65;
+                    drawLines();
+
                 }
             }
             // onError: Failed to get the acceleration
@@ -366,7 +388,7 @@ var app = {
             function onError() {
                 alert('onError!');
             }
-        }*/
+        }
         //Draw the Ball
         function drawBall(x, y, a) {
             context.clearRect(0, 0, canvas.width, canvas.height);
@@ -393,7 +415,6 @@ var app = {
             console.log("currX = " + currX + " currY = " + currY);
             //context.drawImage(img, currX, currY);
             drawBall(currX, currY, .9)
-            console.log("Drew");
         }
 
         //Really Device Motion
@@ -409,7 +430,7 @@ var app = {
         }
 
         function runAccel() {
-            flipDemo('Accelerometer');
+            flipDemo('Device Motion');
             var back = document.querySelector('x-flipbox div:last-child');
             canvas = document.createElement('canvas');
             back.appendChild(canvas);
@@ -434,34 +455,33 @@ var app = {
         }
 
         function runGeo() {
-        	flipDemo('Geolocation');
- 			//need a loading message
+            flipDemo('Geolocation');
+            //need a loading message
 
             var onSuccess = function (position) {
                 console.log('Latitude: ' + position.coords.latitude + '\n' + 'Longitude: ' + position.coords.longitude + '\n');
-            	var back = document.querySelector('x-flipbox div:last-child');
-            	var mapdiv = document.createElement('div');
-            	back.appendChild(mapdiv);
-            	mapdiv.setAttribute('id', 'map');
-            
-            	mapdiv.style.height="300px"
-            	mapdiv.style.width= "320px";
-	
- 	        	var globe = new DAT.Globe(mapdiv);
-
-      			console.log(globe);
-      			var pt = new THREE.Geometry();
-      		
-      			//var data = [53.795,-1.53,2,2];
-      			var geodata = [position.coords.latitude, position.coords.longitude, 2, 2];
-      			globe.addData(geodata, {format: 'magnitude', animated: false});  
-      			globe.createPoints();               
-	        	globe.animate();            
+                var back = document.querySelector('x-flipbox div:last-child');
+                if (!document.getElementById('map')) {
+                    var mapdiv = document.createElement('div');
+                    back.appendChild(mapdiv);
+                    mapdiv.setAttribute('id', 'map');
+                    mapdiv.style.height = "300px"
+                    mapdiv.style.width = "320px";
+                    var globe = new DAT.Globe(mapdiv);
+                    //var data = [53.795,-1.53,2,2];
+                    var geodata = [position.coords.latitude, position.coords.longitude, 2, 2];
+                    globe.addData(geodata, {
+                        format: 'magnitude',
+                        animated: false
+                    });
+                    globe.createPoints();
+                    globe.animate();
+                }
             }
 
-            function onError(error) {
-                alert('code: ' + error.code + '\n' + 'message: ' + error.message + '\n');
-            }
+                function onError(error) {
+                    alert('code: ' + error.code + '\n' + 'message: ' + error.message + '\n');
+                }
 
             navigator.geolocation.getCurrentPosition(onSuccess, onError);
         }
@@ -479,7 +499,7 @@ var app = {
             context.translate(canvas.width / 2, canvas.height / 2);
             context.rotate(myrads);
             context.translate(-img.width / 2, -img.height / 2);
-            context.drawImage(img, 0, 5, img.width, img.height-5);
+            context.drawImage(img, 0, 5, img.width, img.height - 5);
             //console.log("Drawing Needle");
             context.restore();
             context.drawImage(gImg, canvas.width / 2 - img.width / 2, canvas.height / 2 - img.height / 2);
