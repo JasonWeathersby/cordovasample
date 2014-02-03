@@ -152,29 +152,10 @@ var app = {
             var back = appbar.querySelector('.back');
             var backside = flipbox.querySelector('div:last-child');
 
-            back.classList.add('open');
             backside.innerHTML = '';
+            back.classList.add('open');
             appbar.heading = title;
             flipbox.showBack();
-
-            back.addEventListener('click', function () {
-                flipMain();
-
-                if (frameID != null) {
-                    cancelAnimationFrame(frameID);
-                    frameID = null;
-                }
-                if (watchID) {
-                    navigator.compass.clearWatch(watchID);
-                    watchID = null;
-                }
-                if (watchIDAccel) {
-                    navigator.accelerometer.clearWatch(watchIDAccel);
-                    watchIDAccel = null;
-                }
-
-                window.removeEventListener('deviceorientation', deviceOrientationEvent);
-            });
         }
 
         function flipMain() {
@@ -185,7 +166,6 @@ var app = {
             flipbox.showFront();
 
             back.classList.remove('open');
-            backside.innerHTML = '';
             appbar.heading = 'Cordova <3 Firefox OS';
         }
       
@@ -194,6 +174,25 @@ var app = {
             var back = flipbox.querySelector('div:last-child');
             back.appendChild(el);
         };
+
+        document.querySelector('x-appbar .back').addEventListener('click', function () {
+            flipMain();
+
+            if (frameID != null) {
+                cancelAnimationFrame(frameID);
+                frameID = null;
+            }
+            if (watchID) {
+                navigator.compass.clearWatch(watchID);
+                watchID = null;
+            }
+            if (watchIDAccel) {
+                navigator.accelerometer.clearWatch(watchIDAccel);
+                watchIDAccel = null;
+            }
+
+            window.removeEventListener('deviceorientation', deviceOrientationEvent);
+        });
 
         var parentElement = document.getElementById(id);
         var listeningElement = parentElement.querySelector('.listening');
