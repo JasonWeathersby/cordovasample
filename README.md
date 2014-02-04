@@ -1,4 +1,4 @@
-This is a Firefox OS App uses the following external libraries  
+This is a Firefox OS App that uses the following external libraries  
 Brick.js https://developer.mozilla.org/en-US/Apps/Developing/Web_components  
 Three.js http://threejs.org/  
 A modified version of the Google Globe.js WebGl Experiment - https://github.com/dataarts/webgl-globe/tree/master/globe  
@@ -16,6 +16,6 @@ checkout the code into this directory.
     git fetch  
     git checkout -t origin/master  
 
-The Geolocation example uses Three.js and Globe.js and function better on later versions of Firefox OS 1.2>  
+The Geolocation example uses Three.js and Globe.js and functions better on later versions of Firefox OS 1.2>  
 
 See Hacks Blog Post for more details  
