@@ -1,4 +1,4 @@
-This is a Firefox OS App uses the following external libraries
+This is a Firefox OS App uses the following external libraries  return
 Brick.js https://developer.mozilla.org/en-US/Apps/Developing/Web_components
 Three.js http://threejs.org/
 A modified version of the Google Globe.js WebGl Experiment - https://github.com/dataarts/webgl-globe/tree/master/globe
