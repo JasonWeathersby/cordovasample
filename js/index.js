@@ -17,7 +17,6 @@
  * under the License.
  */
 //Landscape vs Portrait
-
 window.onload = init;
 var currY = 0;
 var currY = 0;
@@ -158,7 +157,7 @@ var app = {
             appbar.heading = title;
             flipbox.showBack();
         }
-        
+
         // Flip the screen back to show the main navigation
         function flipMain() {
             var flipbox = document.querySelector('x-flipbox');
@@ -201,9 +200,9 @@ var app = {
 
             window.removeEventListener('deviceorientation', deviceOrientationEvent);
             //If the webgl globe is created stop the animation
-            if( globe ){
-         	   globe.stop();
-               globe=null;
+            if (globe) {
+                globe.stop();
+                globe = null;
             }
         });
 
@@ -215,7 +214,7 @@ var app = {
         console.log('Received Event: ' + id);
 
         function getPicture() {
-        	//Get the picture and put into an image tag that is appended to the document.
+            //Get the picture and put into an image tag that is appended to the document.
             navigator.camera.getPicture(function (src) {
                 // Now that we have a picture, flip to the demo screen
                 // and set the title for the page
@@ -230,7 +229,7 @@ var app = {
                 destinationType: 1
             });
         }
-		//The function get the accelerometer data and draws a moving worm on the canvas
+        //The function get the accelerometer data and draws a moving worm on the canvas
         function getAccel() {
             flipDemo('Accelerometer');
             //Setup the canavs
@@ -245,7 +244,7 @@ var app = {
             currX = canvas.width / 2;
             currY = canvas.height / 2;
 
-			//Call the watch acceleration funciton every 100ms
+            //Call the watch acceleration funciton every 100ms
             var options = {
                 frequency: 100
             };
@@ -253,8 +252,8 @@ var app = {
 
             //navigator.accelerometer.getCurrentAcceleration(onSuccess, onError);
 
-			//This function draws lines for 15 points saved in the pts array
-			//Creating the worm
+            //This function draws lines for 15 points saved in the pts array
+            //Creating the worm
             function drawLines() {
                 context.clearRect(0, 53, canvas.width, canvas.height - 53);
                 if (ptArray.length > 1) {
@@ -271,7 +270,7 @@ var app = {
                 }
 
             }
-			//Successful read of the Accelerometer
+            //Successful read of the Accelerometer
             function onSuccess(acceleration) {
                 var acX = acceleration.x.toFixed(1) * -1;
                 var acY = acceleration.y.toFixed(1);
@@ -286,7 +285,7 @@ var app = {
                 //add some deadband in the x and y directions
                 if ((Math.abs(parseFloat(acX)) > 5) || (Math.abs(parseFloat(acY)) > 5)) {
                     //console.log('Acceleration X: ' + acX + '\n' + 'Acceleration Y: ' + acY + '\n' + 'Acceleration Z: ' + acZ + '\n' + 'Timestamp: ' + acceleration.timestamp + '\n');
-					//Push and shift datapoints with new values
+                    //Push and shift datapoints with new values
                     currX += parseInt(acX);
                     currY += parseInt(acY);
                     var coord = [];
@@ -294,7 +293,7 @@ var app = {
                     coord[1] = currY;
                     var len = ptArray.push(coord);
                     if (len >= 15) ptArray.shift();
-					//Handle x and y boundaries
+                    //Handle x and y boundaries
                     if (currX > canvas.width) currX = canvas.width;
                     if (currY > canvas.height) currX = canvas.height;
                     if (currX < 0) currX = 0;
@@ -312,7 +311,7 @@ var app = {
         }
         //Draw the Ball
         function drawBall(x, y, a) {
-        	//Setup the offscreen canvas
+            //Setup the offscreen canvas
             context.clearRect(0, 0, canvas.width, canvas.height);
             if (bCanvas == null) {
                 setupBallCanvas();
@@ -328,7 +327,7 @@ var app = {
         }
 
         function handleMovement() {
-        	//animate the changes in dx and dy
+            //animate the changes in dx and dy
             frameID = requestAnimationFrame(handleMovement);
             context.clearRect(currX, currY, 60, 60);
             currX += dX;
@@ -348,11 +347,11 @@ var app = {
             var beta = Math.round(eventData.beta);
             //roll left positive roll right neg
             var gamma = Math.round(eventData.gamma);
-            dX = -(gamma / 360) * 100; 
-            dY = -(beta / 360) * 100; 
+            dX = -(gamma / 360) * 100;
+            dY = -(beta / 360) * 100;
             //console.log("dX = " + dX + " dY = " + dY);
         }
-		//Setup HTML5 Device Motion Event Handler
+        //Setup HTML5 Device Motion Event Handler
         function runAccel() {
             flipDemo('Device Motion');
             canvas = document.createElement('canvas');
@@ -372,14 +371,14 @@ var app = {
             //     context.drawImage(this, currX, currY); //when image finishes loading, draw it
             // };
             // img.src = "img/accel.png";
-			//Add the event handler and launch the animation
+            //Add the event handler and launch the animation
             window.addEventListener('deviceorientation', deviceOrientationEvent);
             handleMovement();
         }
-		
-		//Run the geolocation demo
-		//this uses a modified globe.js and three.js
-		//Best to run with Firefox OS 1.2 and higher
+
+        //Run the geolocation demo
+        //this uses a modified globe.js and three.js
+        //Best to run with Firefox OS 1.2 and higher
         function runGeo() {
             flipDemo('Geolocation');
 
@@ -403,7 +402,7 @@ var app = {
                     globe.addData(geodata, {
                         format: 'magnitude',
                         animated: false
-                    });    
+                    });
                     globe.createPoints();
                     //Fire the WebGL animation
                     globe.animate();
@@ -416,7 +415,7 @@ var app = {
 
             navigator.geolocation.getCurrentPosition(onSuccess, onError);
         }
-		//Run this function when the compass updates
+        //Run this function when the compass updates
         function runCompassUpdate() {
             context.clearRect(0, 0, canvas.width, canvas.height);
             var xStart = (canvas.width - img.width) / 2;
@@ -438,12 +437,12 @@ var app = {
             //Draw Glass over the needle
             context.drawImage(gImg, canvas.width / 2 - img.width / 2, canvas.height / 2 - img.height / 2);
         }
-		//This function demonstrates the compass functions
+        //This function demonstrates the compass functions
         function runCompass() {
             flipDemo('Compass');
 
             function onSuccess(heading) {
-            	//Retrieve the compass heading
+                //Retrieve the compass heading
                 var element = document.getElementById('heading');
                 myHeading = (heading.magneticHeading).toFixed(2);
                 //console.log("My Heading = " + myHeading);
@@ -453,7 +452,7 @@ var app = {
             function onError(compassError) {
                 alert('Compass error: ' + compassError.code);
             }
-			//Setup the compass to read every 100ms
+            //Setup the compass to read every 100ms
             var options = {
                 frequency: 100
             };
@@ -482,7 +481,7 @@ var app = {
             img.src = "img/cNeedle.png";
         }
 
-		//Test the Notification API
+        //Test the Notification API
         function runPro() {
             function onPrompt(results) {
                 alert("You selected button number " + results.buttonIndex + " and entered " + results.input1);
@@ -497,9 +496,9 @@ var app = {
             );
 
         }
-		//Use the contacts api to create a contact
-		//Make sure the app is privileged and contain the 
-		//proper contacts permission
+        //Use the contacts api to create a contact
+        //Make sure the app is privileged and contain the 
+        //proper contacts permission
         function createAndSaveContact() {
             var fname = document.getElementById('fname').value;
             var lname = document.getElementById('lname').value;
@@ -530,7 +529,7 @@ var app = {
             contact.save(onSuccess, onError);
 
         }
-		//Check to see if contact exists and if not create it
+        //Check to see if contact exists and if not create it
         function saveContact() {
             var options = new ContactFindOptions();
             options.filter = "";
@@ -563,7 +562,7 @@ var app = {
                 flipMain();
             }
         }
-		//Contacts API Demo
+        //Contacts API Demo
         function addNewContact() {
             flipDemo('Contact');
             var form = document.querySelector('.contactForm').cloneNode(true);
