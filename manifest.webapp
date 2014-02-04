@@ -2,13 +2,19 @@
 	"launch_path":"/index.html",
 	"installs_allowed_from":["*"],
 	"version":"0.0.1",
-	"name":"FirefoxOS-Cordova",
+	"name":"CordovaDemo",
 	"description":"Firefox OS Sample Cordova App",
     "developer": {
-        "name": "James Long and Jason Weathersby",
+        "name": "James Long, Jason Weathersby and Aaron Druck",
         "url": "http://www.mozilla.com"
     },	
-	
+    "icons": {
+        "16": "/img/wrench-icon-16.png",
+        "32": "/img/wrench-icon-32.png",
+        "48": "/img/wrench-icon-48.png",
+        "60": "/img/wrench-icon-60.png",
+        "128": "/img/wrench-icon-128.png"
+ 	},	
 	"type": "privileged",
 	"permissions": {
     		"geolocation": {

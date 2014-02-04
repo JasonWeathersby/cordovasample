@@ -17,6 +17,7 @@
  * under the License.
  */
 //Landscape vs Portrait
+
 window.onload = init;
 var currY = 0;
 var currY = 0;
@@ -34,7 +35,7 @@ var frameID = null;
 var watchIDAccel = null;
 var ballRadius = 20;
 var accelDelay = false;
-
+var globe = null;
 var ptArray = [];
 //Utility function for request animation
 var requestAnimationFrame = (function () {
@@ -66,7 +67,7 @@ function setupBallCanvas() {
         drawCirc(x + i / 12, y - i / 12, radius - i / 6, redval, greenval, blueval, a, m_context);
     }
 }
-
+//Utility function to draw a simple circle
 function drawCirc(x, y, radius, r, g, b, a, dcontext) {
     dcontext.beginPath();
     dcontext.arc(x, y, radius, 0, 2 * Math.PI, false);
@@ -91,7 +92,6 @@ function offscreenCanvas() {
         m_context.fillStyle = radgrad;
         m_context.fill();
         m_context.closePath();
-
         m_context.strokeStyle = 'rgba(200,0,0,0.7)'
         m_context.beginPath();
         m_context.moveTo(m_canvas.width / 2, m_canvas.height / 2 - 5);
@@ -115,7 +115,7 @@ function offscreenCanvas() {
         oCanvas = m_canvas;
     }
 }
-
+//Initialize the app
 function init() {
     console.log("Setting up");
     app.initialize();
@@ -200,6 +200,11 @@ var app = {
             }
 
             window.removeEventListener('deviceorientation', deviceOrientationEvent);
+            //If the webgl globe is created stop the animation
+            if( globe ){
+         	   globe.stop();
+               globe=null;
+            }
         });
 
         var parentElement = document.getElementById(id);
@@ -210,6 +215,7 @@ var app = {
         console.log('Received Event: ' + id);
 
         function getPicture() {
+        	//Get the picture and put into an image tag that is appended to the document.
             navigator.camera.getPicture(function (src) {
                 // Now that we have a picture, flip to the demo screen
                 // and set the title for the page
@@ -224,9 +230,10 @@ var app = {
                 destinationType: 1
             });
         }
-
+		//The function get the accelerometer data and draws a moving worm on the canvas
         function getAccel() {
             flipDemo('Accelerometer');
+            //Setup the canavs
             canvas = document.createElement('canvas');
             setOutput(canvas);
 
@@ -238,13 +245,16 @@ var app = {
             currX = canvas.width / 2;
             currY = canvas.height / 2;
 
+			//Call the watch acceleration funciton every 100ms
             var options = {
                 frequency: 100
             };
             watchIDAccel = navigator.accelerometer.watchAcceleration(onSuccess, onError, options);
 
-            navigator.accelerometer.getCurrentAcceleration(onSuccess, onError);
+            //navigator.accelerometer.getCurrentAcceleration(onSuccess, onError);
 
+			//This function draws lines for 15 points saved in the pts array
+			//Creating the worm
             function drawLines() {
                 context.clearRect(0, 53, canvas.width, canvas.height - 53);
                 if (ptArray.length > 1) {
@@ -261,20 +271,22 @@ var app = {
                 }
 
             }
-
+			//Successful read of the Accelerometer
             function onSuccess(acceleration) {
                 var acX = acceleration.x.toFixed(1) * -1;
                 var acY = acceleration.y.toFixed(1);
                 var acZ = acceleration.z.toFixed(1);
+                //write out the current acceleration values
                 context.clearRect(10, 0, canvas.width / 2, 50);
                 context.fillStyle = "white";
                 context.font = "16px Arial";
                 context.fillText("Accel X " + acX, 10, 20);
                 context.fillText("Accel Y " + acY, 10, 35);
                 context.fillText("Accel Z " + acZ, 10, 50);
+                //add some deadband in the x and y directions
                 if ((Math.abs(parseFloat(acX)) > 5) || (Math.abs(parseFloat(acY)) > 5)) {
-                    console.log('Acceleration X: ' + acX + '\n' + 'Acceleration Y: ' + acY + '\n' + 'Acceleration Z: ' + acZ + '\n' + 'Timestamp: ' + acceleration.timestamp + '\n');
-
+                    //console.log('Acceleration X: ' + acX + '\n' + 'Acceleration Y: ' + acY + '\n' + 'Acceleration Z: ' + acZ + '\n' + 'Timestamp: ' + acceleration.timestamp + '\n');
+					//Push and shift datapoints with new values
                     currX += parseInt(acX);
                     currY += parseInt(acY);
                     var coord = [];
@@ -282,7 +294,7 @@ var app = {
                     coord[1] = currY;
                     var len = ptArray.push(coord);
                     if (len >= 15) ptArray.shift();
-
+					//Handle x and y boundaries
                     if (currX > canvas.width) currX = canvas.width;
                     if (currY > canvas.height) currX = canvas.height;
                     if (currX < 0) currX = 0;
@@ -300,6 +312,7 @@ var app = {
         }
         //Draw the Ball
         function drawBall(x, y, a) {
+        	//Setup the offscreen canvas
             context.clearRect(0, 0, canvas.width, canvas.height);
             if (bCanvas == null) {
                 setupBallCanvas();
@@ -307,12 +320,15 @@ var app = {
             var redval = 68;
             var greenval = 68;
             var blueval = 68;
+            //draw shadow of ball
             drawCirc(x + 1, y + 1, ballRadius + 3, redval, greenval, blueval, 0.3, context);
+            //draw offscreen canvas
             context.drawImage(bCanvas, x - ballRadius, y - ballRadius, ballRadius * 2, ballRadius * 2);
             context.globalAlpha = 1;
         }
 
         function handleMovement() {
+        	//animate the changes in dx and dy
             frameID = requestAnimationFrame(handleMovement);
             context.clearRect(currX, currY, 60, 60);
             currX += dX;
@@ -321,27 +337,26 @@ var app = {
             if (currX <= 20) currX = 20;
             if (currY >= (canvas.height - 20))(currY = canvas.height - 20);
             if (currY <= 20) currY = 20;
-            console.log("currX = " + currX + " currY = " + currY);
+            //console.log("currX = " + currX + " currY = " + currY);
             drawBall(currX, currY, .9)
         }
 
-        //Really Device Motion
+        //Really HTML Device Motion Event
         function deviceOrientationEvent(eventData) {
             var alpha = Math.round(eventData.alpha);
             //front to back - neg back postive front
             var beta = Math.round(eventData.beta);
             //roll left positive roll right neg
             var gamma = Math.round(eventData.gamma);
-            dX = -(gamma / 360) * 100; //Math.cos((gamma/360)*Math.PI*2);
-            dY = -(beta / 360) * 100; //Math.cos((gamma/360)*Math.PI*2)*beta/7;
-            console.log("dX = " + dX + " dY = " + dY);
+            dX = -(gamma / 360) * 100; 
+            dY = -(beta / 360) * 100; 
+            //console.log("dX = " + dX + " dY = " + dY);
         }
-
+		//Setup HTML5 Device Motion Event Handler
         function runAccel() {
             flipDemo('Device Motion');
             canvas = document.createElement('canvas');
             setOutput(canvas);
-
             var rect = canvas.getBoundingClientRect();
 
             canvas.height = window.innerHeight - rect.top;
@@ -357,11 +372,14 @@ var app = {
             //     context.drawImage(this, currX, currY); //when image finishes loading, draw it
             // };
             // img.src = "img/accel.png";
-
+			//Add the event handler and launch the animation
             window.addEventListener('deviceorientation', deviceOrientationEvent);
             handleMovement();
         }
-
+		
+		//Run the geolocation demo
+		//this uses a modified globe.js and three.js
+		//Best to run with Firefox OS 1.2 and higher
         function runGeo() {
             flipDemo('Geolocation');
 
@@ -374,17 +392,20 @@ var app = {
                 if (!document.getElementById('map')) {
                     var mapdiv = document.createElement('div');
                     setOutput(mapdiv);
+                    //Create WebGL Globe Div
                     mapdiv.setAttribute('id', 'map');
-                    mapdiv.style.height = "300px";
+                    mapdiv.style.height = "400px";
                     mapdiv.style.width = "320px";
-                    var globe = new DAT.Globe(mapdiv);
+                    globe = new DAT.Globe(mapdiv);
                     //var data = [53.795,-1.53,2,2];
+                    //Setup the geo point of light
                     var geodata = [position.coords.latitude, position.coords.longitude, 2, 2];
                     globe.addData(geodata, {
                         format: 'magnitude',
                         animated: false
-                    });
+                    });    
                     globe.createPoints();
+                    //Fire the WebGL animation
                     globe.animate();
                 }
             };
@@ -395,7 +416,7 @@ var app = {
 
             navigator.geolocation.getCurrentPosition(onSuccess, onError);
         }
-
+		//Run this function when the compass updates
         function runCompassUpdate() {
             context.clearRect(0, 0, canvas.width, canvas.height);
             var xStart = (canvas.width - img.width) / 2;
@@ -404,33 +425,37 @@ var app = {
             context.font = '18pt Calibri';
             context.fillStyle = 'white';
             context.fillText("Current Heading: " + myHeading, canvas.width * .095, canvas.height * .05);
+            //Draw compass background from offscreen canvas
             context.drawImage(oCanvas, canvas.width / 2 - img.width / 2, canvas.height / 2 - img.height / 2);
             context.save();
+            //rotate needle proper amount
             context.translate(canvas.width / 2, canvas.height / 2);
             context.rotate(myrads);
             context.translate(-img.width / 2, -img.height / 2);
             context.drawImage(img, 0, 5, img.width, img.height - 5);
             //console.log("Drawing Needle");
             context.restore();
+            //Draw Glass over the needle
             context.drawImage(gImg, canvas.width / 2 - img.width / 2, canvas.height / 2 - img.height / 2);
         }
-
+		//This function demonstrates the compass functions
         function runCompass() {
             flipDemo('Compass');
 
             function onSuccess(heading) {
+            	//Retrieve the compass heading
                 var element = document.getElementById('heading');
                 myHeading = (heading.magneticHeading).toFixed(2);
-                console.log("My Heading = " + myHeading);
+                //console.log("My Heading = " + myHeading);
                 runCompassUpdate();
             }
 
             function onError(compassError) {
                 alert('Compass error: ' + compassError.code);
             }
-
+			//Setup the compass to read every 100ms
             var options = {
-                frequency: 500
+                frequency: 100
             };
             watchID = navigator.compass.watchHeading(onSuccess, onError, options);
 
@@ -442,20 +467,22 @@ var app = {
             canvas.height = window.innerHeight - rect.top;
             canvas.width = window.innerWidth;
             context = canvas.getContext('2d');
+            //Load the compass glass image
             gImg = new Image();
             gImg.src = "img/glass.png";
+            //Load the compass needle image
             img = new Image(); //create image object
-            console.log("CH " + canvas.height + " CW " + canvas.width);
             img.onload = function () { //create our handler
                 var xStart = (canvas.width - img.width) / 2;
                 var yStart = (canvas.height - img.height) / 2;
+                //Setup background canvas
                 offscreenCanvas();
                 runCompassUpdate();
             };
             img.src = "img/cNeedle.png";
         }
 
-
+		//Test the Notification API
         function runPro() {
             function onPrompt(results) {
                 alert("You selected button number " + results.buttonIndex + " and entered " + results.input1);
@@ -470,7 +497,9 @@ var app = {
             );
 
         }
-
+		//Use the contacts api to create a contact
+		//Make sure the app is privileged and contain the 
+		//proper contacts permission
         function createAndSaveContact() {
             var fname = document.getElementById('fname').value;
             var lname = document.getElementById('lname').value;
@@ -488,8 +517,6 @@ var app = {
 
             // create a new contact object
             var contact = navigator.contacts.create();
-            //contact.displayName = "Test";
-            //contact.nickname="Test";
             // populate some fields
             var name = new ContactName();
             name.givenName = fname;
@@ -497,13 +524,13 @@ var app = {
             contact.name = name;
             var emails = [];
             //Currently not working
-            emails[0] = new ContactField('Personal', 'junk@gmail.com', false);
+            emails[0] = new ContactField('Personal', email, false);
             contact.emails = emails;
             // save to device
             contact.save(onSuccess, onError);
 
         }
-
+		//Check to see if contact exists and if not create it
         function saveContact() {
             var options = new ContactFindOptions();
             options.filter = "";
@@ -516,14 +543,16 @@ var app = {
             function onSuccess(contacts) {
                 if (contacts.length == 0) createAndSaveContact();
                 for (var i = 0; i < contacts.length; i++) {
-                    console.log("Name = " + contacts[i].name.givenName + "," + contacts[i].name.familyName + " emails " + contacts[i].emails);
+                    //console.log("Name = " + contacts[i].name.givenName + "," + contacts[i].name.familyName + " emails " + contacts[i].emails);
                     if (contacts[i].name.givenName == fname && contacts[i].name.familyName == lname) {
+                        //Contact exists already
                         console.log("name already added");
                         flipMain();
                         return;
                     }
 
                 }
+                //Does not exist add them
                 createAndSaveContact();
 
             }
@@ -534,7 +563,7 @@ var app = {
                 flipMain();
             }
         }
-
+		//Contacts API Demo
         function addNewContact() {
             flipDemo('Contact');
             var form = document.querySelector('.contactForm').cloneNode(true);

@@ -10,6 +10,11 @@
 *
 * http://www.apache.org/licenses/LICENSE-2.0
 */
+/*
+* J. Weathersby, Mozilla 1/2013 Added touch events 
+* J. Weathersby, Mozilla 1/2013 Changed location of world.jpg 
+* J. Weathersby, Mozilla 1/2013 Added public stop event
+*/
 
 var DAT = DAT || {};
 
@@ -86,7 +91,7 @@ DAT.Globe = function(container, colorFn) {
   var PI_HALF = Math.PI / 2;
 
   function init() {
-
+    animHandle=null;
     container.style.color = '#fff';
     container.style.font = '13px/20px Arial, sans-serif';
 
@@ -386,8 +391,14 @@ DAT.Globe = function(container, colorFn) {
   }
 
   function animate() {
-    requestAnimationFrame(animate);
+    animHandle = requestAnimationFrame(animate);
     render();
+  }
+  function stop(){
+  	if( animHandle ){
+  	   cancelAnimationFrame(animHandle);
+  	   animHandle=null;
+  	}
   }
 
   function render() {
@@ -444,6 +455,7 @@ DAT.Globe = function(container, colorFn) {
   this.createPoints = createPoints;
   this.renderer = renderer;
   this.scene = scene;
+  this.stop = stop;
 
   return this;
 
