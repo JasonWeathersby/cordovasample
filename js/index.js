@@ -49,12 +49,10 @@ var cancelAnimationFrame = (function () {
 //This function creates an offscreen canvas to create a ball
 
 function setupBallCanvas() {
-
     bCanvas = document.createElement('canvas');
     bCanvas.width = ballRadius * 2;
     bCanvas.height = ballRadius * 2;
     var m_context = bCanvas.getContext('2d');
-
 
     var radius = ballRadius;
     x = radius;
@@ -67,7 +65,6 @@ function setupBallCanvas() {
         var blueval = 220 + i
         drawCirc(x + i / 12, y - i / 12, radius - i / 6, redval, greenval, blueval, a, m_context);
     }
-
 }
 
 function drawCirc(x, y, radius, r, g, b, a, dcontext) {
@@ -94,6 +91,7 @@ function offscreenCanvas() {
         m_context.fillStyle = radgrad;
         m_context.fill();
         m_context.closePath();
+
         m_context.strokeStyle = 'rgba(200,0,0,0.7)'
         m_context.beginPath();
         m_context.moveTo(m_canvas.width / 2, m_canvas.height / 2 - 5);
@@ -172,9 +170,16 @@ var app = {
 
         function appendToOutput(el) {
             var flipbox = document.querySelector('x-flipbox');
-            var back = flipbox.querySelector('div:last-child');
-            back.appendChild(el);
+            var backside = flipbox.querySelector('div:last-child');
+            backside.appendChild(el);
         };
+
+        function setOutput(el) {
+            var flipbox = document.querySelector('x-flipbox');
+            var backside = flipbox.querySelector('div:last-child');
+            backside.innerHTML = '';
+            backside.appendChild(el);
+        }
 
         document.querySelector('x-appbar .back').addEventListener('click', function () {
             flipMain();
@@ -213,12 +218,11 @@ var app = {
                 destinationType: 1
             });
         }
+
         function getAccel() {
             flipDemo('Accelerometer');
-
-            var back = document.querySelector('x-flipbox div:last-child');
             canvas = document.createElement('canvas');
-            back.appendChild(canvas);
+            setOutput(canvas);
 
             var rect = canvas.getBoundingClientRect();
 
@@ -312,7 +316,6 @@ var app = {
             if (currY >= (canvas.height - 20))(currY = canvas.height - 20);
             if (currY <= 20) currY = 20;
             console.log("currX = " + currX + " currY = " + currY);
-            //context.drawImage(img, currX, currY);
             drawBall(currX, currY, .9)
         }
 
@@ -330,9 +333,8 @@ var app = {
 
         function runAccel() {
             flipDemo('Device Motion');
-            var back = document.querySelector('x-flipbox div:last-child');
             canvas = document.createElement('canvas');
-            back.appendChild(canvas);
+            setOutput(canvas);
 
             var rect = canvas.getBoundingClientRect();
 
@@ -343,11 +345,12 @@ var app = {
             dY = 0;
             currX = canvas.width / 2;
             currY = canvas.height / 2;
-            img = new Image(); //create image object
-            img.onload = function () { //create our handler
-                context.drawImage(this, currX, currY); //when image finishes loading, draw it
-            };
-            img.src = "img/accel.png";
+
+            // img = new Image(); //create image object
+            // img.onload = function () { //create our handler
+            //     context.drawImage(this, currX, currY); //when image finishes loading, draw it
+            // };
+            // img.src = "img/accel.png";
 
             window.addEventListener('deviceorientation', deviceOrientationEvent);
             handleMovement();
@@ -355,16 +358,18 @@ var app = {
 
         function runGeo() {
             flipDemo('Geolocation');
-            //need a loading message
+
+            var loading = document.createElement('div');
+            loading.className = 'loading';
+            loading.innerHTML = 'Getting Location...';
+            setOutput(loading);
 
             var onSuccess = function (position) {
-                console.log('Latitude: ' + position.coords.latitude + '\n' + 'Longitude: ' + position.coords.longitude + '\n');
-                var back = document.querySelector('x-flipbox div:last-child');
                 if (!document.getElementById('map')) {
                     var mapdiv = document.createElement('div');
-                    back.appendChild(mapdiv);
+                    setOutput(mapdiv);
                     mapdiv.setAttribute('id', 'map');
-                    mapdiv.style.height = "300px"
+                    mapdiv.style.height = "300px";
                     mapdiv.style.width = "320px";
                     var globe = new DAT.Globe(mapdiv);
                     //var data = [53.795,-1.53,2,2];
@@ -376,11 +381,11 @@ var app = {
                     globe.createPoints();
                     globe.animate();
                 }
-            }
+            };
 
-                function onError(error) {
-                    alert('code: ' + error.code + '\n' + 'message: ' + error.message + '\n');
-                }
+            function onError(error) {
+                alert('code: ' + error.code + '\n' + 'message: ' + error.message + '\n');
+            }
 
             navigator.geolocation.getCurrentPosition(onSuccess, onError);
         }
@@ -423,10 +428,8 @@ var app = {
             };
             watchID = navigator.compass.watchHeading(onSuccess, onError, options);
 
-
-            var back = document.querySelector('x-flipbox div:last-child');
             canvas = document.createElement('canvas');
-            back.appendChild(canvas);
+            setOutput(canvas);
 
             var rect = canvas.getBoundingClientRect();
 
@@ -528,9 +531,8 @@ var app = {
 
         function addNewContact() {
             flipDemo('Contact');
-            var back = document.querySelector('x-flipbox div:last-child');
             var form = document.querySelector('.contactForm').cloneNode(true);
-            back.appendChild(form);
+            setOutput(form);
 
             var button2 = document.querySelector('x-flipbox .contactForm .save');
             button2.addEventListener('click', saveContact, false);

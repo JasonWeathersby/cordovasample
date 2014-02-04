@@ -41,7 +41,7 @@ body {
     height:100%;
     margin:0px;
     padding:0px;
-    text-transform:uppercase;
+    text-transform: uppercase;
     width:100%;
 }
 
@@ -70,10 +70,6 @@ x-flipbox > div {
 
 x-flipbox > div:first-child {
     padding: 1em;
-}
-
-x-flipbox > div:last-child {
-    padding-top: 1em;
 }
 
 h1 {
@@ -159,4 +155,13 @@ x-appbar button.back {
 
 x-appbar button.back.open {
     display: block;
+}
+
+.loading {
+    width: 100%;
+    height: 100%;
+    padding-top: 3em;
+    text-align: center;
+    font-style: italic;
+    text-transform: none;
 }
