@@ -493,7 +493,7 @@ var app = {
                 onPrompt, // callback to invoke
                 'Prompt Test', // title
                 ['Ok', 'Exit'], // buttonLabels
-                'Jane,Doe' // defaultText
+                'Doe, Jane' // defaultText
             );
 
         }
