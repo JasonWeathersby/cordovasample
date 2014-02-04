@@ -9,7 +9,6 @@ If you want to run this you will need to have Cordova installed and a project cr
     $ cordova create test com.example.test TestApp  
 cd to the test/www directory and delete files  
 checkout the code into this directory.  
-//fork or clone the code  
     
     git init  
     git remote add origin https://github.com/JasonWeathersby/cordovasample  
