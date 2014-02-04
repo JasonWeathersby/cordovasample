@@ -145,6 +145,8 @@ var app = {
     // Update DOM on a Received Event
     receivedEvent: function (id) {
 
+        // Flip the screen to show the contents of a demo. The header
+        // will display `title` as the title
         function flipDemo(title) {
             var flipbox = document.querySelector('x-flipbox');
             var appbar = document.querySelector('x-appbar');
@@ -156,7 +158,8 @@ var app = {
             appbar.heading = title;
             flipbox.showBack();
         }
-
+        
+        // Flip the screen back to show the main navigation
         function flipMain() {
             var flipbox = document.querySelector('x-flipbox');
             var appbar = document.querySelector('x-appbar');
@@ -168,12 +171,8 @@ var app = {
             appbar.heading = 'Cordova <3 Firefox OS';
         }
 
-        function appendToOutput(el) {
-            var flipbox = document.querySelector('x-flipbox');
-            var backside = flipbox.querySelector('div:last-child');
-            backside.appendChild(el);
-        };
-
+        // Set the contents of the screen. Used by demos to
+        // dynamically build the DOM for the demo and show it.
         function setOutput(el) {
             var flipbox = document.querySelector('x-flipbox');
             var backside = flipbox.querySelector('div:last-child');
@@ -181,6 +180,9 @@ var app = {
             backside.appendChild(el);
         }
 
+        // The "back" button will appear in the header on the demo
+        // pages. Make it flip back to the navigation and clear any
+        // events when touched.
         document.querySelector('x-appbar .back').addEventListener('click', function () {
             flipMain();
 
@@ -209,11 +211,15 @@ var app = {
 
         function getPicture() {
             navigator.camera.getPicture(function (src) {
+                // Now that we have a picture, flip to the demo screen
+                // and set the title for the page
                 flipDemo('Picture');
+
+                // Display the picture
                 var img = document.createElement('img');
                 img.id = 'slide';
                 img.src = src;
-                appendToOutput(img);
+                setOutput(img);
             }, function () {}, {
                 destinationType: 1
             });
@@ -538,6 +544,8 @@ var app = {
             button2.addEventListener('click', saveContact, false);
         }
 
+        // Wire up events for all the navigation buttons on the main
+        // page to run individual demos
         var button = document.getElementById('getPicture');
         button.addEventListener('click', getPicture, false);
         button = document.getElementById('getAccel');
