@@ -12,6 +12,6 @@ checkout the code into this directory.
 
     git clone https://github.com/JasonWeathersby/cordovasample www     
 
-The Geolocation example uses Three.js and Globe.js and functions better on later versions of Firefox OS 1.2>  
+The Geolocation example uses Three.js and Globe.js and functions better on later versions of Firefox OS 1.2 or greater  
 
 See Hacks Blog Post for more details  
