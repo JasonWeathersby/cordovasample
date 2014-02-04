@@ -7,13 +7,10 @@ and Cordova http://cordova.apache.org/
 If you want to run this you will need to have Cordova installed and a project created  
 
     $ cordova create test com.example.test TestApp  
-cd to the test/www directory and delete files  
+cd to the test directory and delete the www folder      
 checkout the code into this directory.  
-    
-    git init  
-    git remote add origin https://github.com/JasonWeathersby/cordovasample  
-    git fetch  
-    git checkout -t origin/master  
+
+    git clone https://github.com/JasonWeathersby/cordovasample www     
 
 The Geolocation example uses Three.js and Globe.js and functions better on later versions of Firefox OS 1.2>  
 
