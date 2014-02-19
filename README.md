@@ -17,12 +17,12 @@ The Geolocation example uses Three.js and Globe.js and functions better on later
 See Hacks Blog Post for more details  
 https://hacks.mozilla.org/2014/02/building-cordova-apps-for-firefox-os/
 
-Make sure to use the cordova plugin add command to add the following plugins:
-'org.apache.cordova.camera',
-  'org.apache.cordova.contacts',
-  'org.apache.cordova.device',
-  'org.apache.cordova.device-motion',
-  'org.apache.cordova.device-orientation',
-  'org.apache.cordova.dialogs',
-  'org.apache.cordova.geolocation',
-  'org.apache.cordova.vibration' 
+Make sure to use the cordova plugin add command to add the following plugins:  
+  'org.apache.cordova.camera',  
+  'org.apache.cordova.contacts',  
+  'org.apache.cordova.device',  
+  'org.apache.cordova.device-motion',  
+  'org.apache.cordova.device-orientation',  
+  'org.apache.cordova.dialogs',  
+  'org.apache.cordova.geolocation',  
+  'org.apache.cordova.vibration'   
