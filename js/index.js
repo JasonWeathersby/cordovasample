@@ -503,14 +503,6 @@ var app = {
         //Contacts API Demo
         function addNewContact() {
 
-            window.onkeypress = keypress;
-
-            function keypress(e) {
-                console.log("keypress event detected!");
-                if (e.which === 13) { //|| e.charCode === 0){
-                    console.log("return presses");
-                }
-            }
             //Use the contacts api to create a contact
             //Make sure the app is privileged and contain the 
             //proper contacts permission
