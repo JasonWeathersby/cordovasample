@@ -503,6 +503,14 @@ var app = {
         //Contacts API Demo
         function addNewContact() {
 
+            window.onkeypress = keypress;
+
+            function keypress(e) {
+                console.log("keypress event detected!");
+                if (e.which === 13) { //|| e.charCode === 0){
+                    console.log("return presses");
+                }
+            }
             //Use the contacts api to create a contact
             //Make sure the app is privileged and contain the 
             //proper contacts permission
@@ -552,7 +560,10 @@ var app = {
                 navigator.contacts.find(fields, onSuccess, onError, options);
 
                 function onSuccess(contacts) {
-                    if (contacts.length == 0) createAndSaveContact();
+                    if (contacts.length == 0) {
+                        createAndSaveContact();
+                        return;
+                    }
                     for (var i = 0; i < contacts.length; i++) {
                         //console.log("Name = " + contacts[i].name.givenName + "," + contacts[i].name.familyName + " emails " + contacts[i].emails);
                         if (contacts[i].name.givenName == fname && contacts[i].name.familyName == lname) {
