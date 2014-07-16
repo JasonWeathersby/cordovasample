@@ -60,7 +60,7 @@ var app = {
         var netEvent = null;
         var batteryEvent = null;
         var frameID = null;
-        var deviceEAdded = false;
+        var deviceEAdded = null;
         //Utility function for request animation
         var requestAnimationFrame = (function () {
             return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame
@@ -158,9 +158,9 @@ var app = {
                 globe.stop();
                 globe = null;
             }
-            if (deviceEAdded) {
-                window.removeEventListener('deviceorientation', deviceOrientationEvent);
-                deviceEAdded = false;
+            if (deviceEAdded) { //deviceorientation
+                document.removeEventListener('deviceorientation', deviceOrientationEvent);
+                deviceEAdded = null;
             }
             if (browserRef) {
                 browserRef.close();
@@ -286,8 +286,19 @@ var app = {
             }
         }
 
-
+        //Really HTML Device Motion Event
+        function deviceOrientationEvent(eventData) {
+                var alpha = Math.round(eventData.alpha);
+                //front to back - neg back postive front
+                var beta = Math.round(eventData.beta);
+                //roll left positive roll right neg
+                var gamma = Math.round(eventData.gamma);
+                dX = -(gamma / 360) * 100;
+                dY = -(beta / 360) * 100;
+                //console.log("dX = " + dX + " dY = " + dY);
+        }
         //Setup HTML5 Device Motion Event Handler
+
         function runAccel() {
             var bCanvas = null;
             var canvas = null;
@@ -354,18 +365,6 @@ var app = {
                 drawBall(currX, currY, .9)
             }
 
-            //Really HTML Device Motion Event
-            function deviceOrientationEvent(eventData) {
-                var alpha = Math.round(eventData.alpha);
-                //front to back - neg back postive front
-                var beta = Math.round(eventData.beta);
-                //roll left positive roll right neg
-                var gamma = Math.round(eventData.gamma);
-                dX = -(gamma / 360) * 100;
-                dY = -(beta / 360) * 100;
-                //console.log("dX = " + dX + " dY = " + dY);
-            }
-
             canvas = document.createElement('canvas');
             setOutput(canvas);
             var rect = canvas.getBoundingClientRect();
@@ -379,7 +378,7 @@ var app = {
             currY = canvas.height / 2;
 
             //Add the event handler and launch the animation
-            window.addEventListener('deviceorientation', deviceOrientationEvent);
+            document.addEventListener('deviceorientation', deviceOrientationEvent);
             deviceEAdded = true;
             handleMovement();
         }
@@ -498,7 +497,7 @@ var app = {
                 //Retrieve the compass heading
                 var element = document.getElementById('heading');
                 myHeading = (heading.magneticHeading).toFixed(2);
-                //console.log("My Heading = " + myHeading);
+                console.log("My Heading = " + myHeading);
                 runCompassUpdate();
             }
 
@@ -507,7 +506,7 @@ var app = {
                 }
                 //Setup the compass to read every 100ms
             var options = {
-                frequency: 100
+                frequency: 300
             };
             watchID = navigator.compass.watchHeading(onSuccess, onError, options);
 
