@@ -26,3 +26,5 @@ Make sure to use the cordova plugin add command to add the following plugins:
   'org.apache.cordova.dialogs',  
   'org.apache.cordova.geolocation',  
   'org.apache.cordova.vibration'   
+
+Currently you Currently you will need to take the manifest.webapp file in the source and copy it to the merges/firefoxos directory
