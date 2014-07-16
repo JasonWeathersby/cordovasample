@@ -56,6 +56,9 @@ var app = {
         var watchIDAccel = null;
         var watchID = null;
         var globe = null;
+        var browserRef = null;
+        var netEvent = null;
+        var batteryEvent = null;
         var frameID = null;
         var deviceEAdded = false;
         //Utility function for request animation
@@ -101,9 +104,40 @@ var app = {
             backside.appendChild(el);
         }
 
-        // The "back" button will appear in the header on the demo
-        // pages. Make it flip back to the navigation and clear any
-        // events when touched.
+        function appendOutput(el) {
+            var flipbox = document.querySelector('x-flipbox');
+            var backside = flipbox.querySelector('div:last-child');
+            //backside.innerHTML = '';
+            backside.appendChild(el);
+        }
+
+        function clearOutput() {
+            var flipbox = document.querySelector('x-flipbox');
+            var backside = flipbox.querySelector('div:last-child');
+            backside.innerHTML = '';
+        }
+
+        function writeText(text) {
+            var loading = document.createElement('pre');
+            loading.innerHTML = text;
+            appendOutput(loading);
+        }
+
+        function online() {
+            alert("Online");
+        }
+
+        function offline() {
+            alert("Offline");
+        }
+
+        function onBatteryStatus(info) {
+                // Handle the online event
+                writeText("Level: " + info.level + " isPlugged: " + info.isPlugged);
+            }
+            // The "back" button will appear in the header on the demo
+            // pages. Make it flip back to the navigation and clear any
+            // events when touched.
         document.querySelector('x-appbar .back').addEventListener('click', function () {
             flipMain();
 
@@ -128,7 +162,19 @@ var app = {
                 window.removeEventListener('deviceorientation', deviceOrientationEvent);
                 deviceEAdded = false;
             }
-
+            if (browserRef) {
+                browserRef.close();
+                browserRef = null;
+            }
+            if (netEvent) {
+                document.removeEventListener('online', online);
+                document.removeEventListener('offline', offline);
+                netInfo = null;
+            }
+            if (batteryEvent) {
+                window.removeEventListener("batterystatus", onBatteryStatus);
+                batteryEvent = null;
+            }
         });
 
         var parentElement = document.getElementById(id);
@@ -139,22 +185,23 @@ var app = {
         console.log('Received Event: ' + id);
 
         function getPicture() {
-            //Get the picture and put into an image tag that is appended to the document.
-            navigator.camera.getPicture(function (src) {
-                // Now that we have a picture, flip to the demo screen
-                // and set the title for the page
-                flipDemo('Picture');
+                //Get the picture and put into an image tag that is appended to the document.
+                navigator.camera.getPicture(function (src) {
+                    // Now that we have a picture, flip to the demo screen
+                    // and set the title for the page
+                    flipDemo('Picture');
 
-                // Display the picture
-                var img = document.createElement('img');
-                img.id = 'slide';
-                img.src = src;
-                setOutput(img);
-            }, function () {}, {
-                destinationType: 1
-            });
-        }
-        //The function get the accelerometer data and draws a moving worm on the canvas
+                    // Display the picture
+                    var img = document.createElement('img');
+                    img.id = 'slide';
+                    img.src = src;
+                    setOutput(img);
+                }, function () {}, {
+                    destinationType: 1
+                });
+            }
+            //The function get the accelerometer data and draws a moving worm on the canvas
+
         function getAccel() {
             var ptArray = [];
             var canvas = null;
@@ -183,55 +230,56 @@ var app = {
             //This function draws lines for 15 points saved in the pts array
             //Creating the worm
             function drawLines() {
-                context.clearRect(0, 53, canvas.width, canvas.height - 53);
-                if (ptArray.length > 1) {
-                    for (var ii = 0; ii < ptArray.length; ii++) {
-                        context.beginPath();
-                        context.moveTo(ptArray[ii][0], ptArray[ii][1]);
-                        if ((ii + 1) < ptArray.length) {
-                            context.lineTo(ptArray[(ii + 1)][0], ptArray[(ii + 1)][1]);
-                            context.lineWidth = 3.5;
-                            context.strokeStyle = 'rgba(230,186,124,0.9)';
-                            context.stroke();
+                    context.clearRect(0, 53, canvas.width, canvas.height - 53);
+                    if (ptArray.length > 1) {
+                        for (var ii = 0; ii < ptArray.length; ii++) {
+                            context.beginPath();
+                            context.moveTo(ptArray[ii][0], ptArray[ii][1]);
+                            if ((ii + 1) < ptArray.length) {
+                                context.lineTo(ptArray[(ii + 1)][0], ptArray[(ii + 1)][1]);
+                                context.lineWidth = 3.5;
+                                context.strokeStyle = 'rgba(230,186,124,0.9)';
+                                context.stroke();
+                            }
                         }
                     }
-                }
 
-            }
-            //Successful read of the Accelerometer
+                }
+                //Successful read of the Accelerometer
+
             function onSuccess(acceleration) {
-                var acX = acceleration.x.toFixed(1) * -1;
-                var acY = acceleration.y.toFixed(1);
-                var acZ = acceleration.z.toFixed(1);
-                //write out the current acceleration values
-                context.clearRect(10, 0, canvas.width / 2, 50);
-                context.fillStyle = "white";
-                context.font = "16px Arial";
-                context.fillText("Accel X " + acX, 10, 20);
-                context.fillText("Accel Y " + acY, 10, 35);
-                context.fillText("Accel Z " + acZ, 10, 50);
-                //add some deadband in the x and y directions
-                if ((Math.abs(parseFloat(acX)) > 5) || (Math.abs(parseFloat(acY)) > 5)) {
-                    //console.log('Acceleration X: ' + acX + '\n' + 'Acceleration Y: ' + acY + '\n' + 'Acceleration Z: ' + acZ + '\n' + 'Timestamp: ' + acceleration.timestamp + '\n');
-                    //Push and shift datapoints with new values
-                    currX += parseInt(acX);
-                    currY += parseInt(acY);
-                    var coord = [];
-                    coord[0] = currX;
-                    coord[1] = currY;
-                    var len = ptArray.push(coord);
-                    if (len >= 15) ptArray.shift();
-                    //Handle x and y boundaries
-                    if (currX > canvas.width) currX = canvas.width;
-                    if (currY > canvas.height) currX = canvas.height;
-                    if (currX < 0) currX = 0;
-                    if (currY < 65) currY = 65;
-                    drawLines();
+                    var acX = acceleration.x.toFixed(1) * -1;
+                    var acY = acceleration.y.toFixed(1);
+                    var acZ = acceleration.z.toFixed(1);
+                    //write out the current acceleration values
+                    context.clearRect(10, 0, canvas.width / 2, 50);
+                    context.fillStyle = "white";
+                    context.font = "16px Arial";
+                    context.fillText("Accel X " + acX, 10, 20);
+                    context.fillText("Accel Y " + acY, 10, 35);
+                    context.fillText("Accel Z " + acZ, 10, 50);
+                    //add some deadband in the x and y directions
+                    if ((Math.abs(parseFloat(acX)) > 5) || (Math.abs(parseFloat(acY)) > 5)) {
+                        //console.log('Acceleration X: ' + acX + '\n' + 'Acceleration Y: ' + acY + '\n' + 'Acceleration Z: ' + acZ + '\n' + 'Timestamp: ' + acceleration.timestamp + '\n');
+                        //Push and shift datapoints with new values
+                        currX += parseInt(acX);
+                        currY += parseInt(acY);
+                        var coord = [];
+                        coord[0] = currX;
+                        coord[1] = currY;
+                        var len = ptArray.push(coord);
+                        if (len >= 15) ptArray.shift();
+                        //Handle x and y boundaries
+                        if (currX > canvas.width) currX = canvas.width;
+                        if (currY > canvas.height) currX = canvas.height;
+                        if (currX < 0) currX = 0;
+                        if (currY < 65) currY = 65;
+                        drawLines();
 
+                    }
                 }
-            }
-            // onError: Failed to get the acceleration
-            //
+                // onError: Failed to get the acceleration
+                //
 
             function onError() {
                 alert('onError!');
@@ -248,23 +296,24 @@ var app = {
             //This function creates an offscreen canvas to create a ball
 
             function setupBallCanvas() {
-                var radius = 20;
-                bCanvas = document.createElement('canvas');
-                bCanvas.width = radius * 2;
-                bCanvas.height = radius * 2;
-                var m_context = bCanvas.getContext('2d');
-                x = radius;
-                y = radius;
-                a = .8;
-                loopcount = 60;
-                for (var i = 0; i < loopcount; i++) {
-                    var redval = 265;
-                    var greenval = 245;
-                    var blueval = 220 + i
-                    drawCirc(x + i / 12, y - i / 12, radius - i / 6, redval, greenval, blueval, a, m_context);
+                    var radius = 20;
+                    bCanvas = document.createElement('canvas');
+                    bCanvas.width = radius * 2;
+                    bCanvas.height = radius * 2;
+                    var m_context = bCanvas.getContext('2d');
+                    x = radius;
+                    y = radius;
+                    a = .8;
+                    loopcount = 60;
+                    for (var i = 0; i < loopcount; i++) {
+                        var redval = 265;
+                        var greenval = 245;
+                        var blueval = 220 + i
+                        drawCirc(x + i / 12, y - i / 12, radius - i / 6, redval, greenval, blueval, a, m_context);
+                    }
                 }
-            }
-            //Utility function to draw a simple circle
+                //Utility function to draw a simple circle
+
             function drawCirc(x, y, radius, r, g, b, a, dcontext) {
                 dcontext.beginPath();
                 dcontext.arc(x, y, radius, 0, 2 * Math.PI, false);
@@ -385,43 +434,44 @@ var app = {
             //This function just creates an offscreen canvas to hold a picture of the compass
             //background
             function offscreenCanvas() {
-                if (img != null && oCanvas == null) {
-                    var m_canvas = document.createElement('canvas');
-                    m_canvas.width = img.width;
-                    m_canvas.height = img.height;
-                    m_context = m_canvas.getContext('2d');
-                    m_context.beginPath();
-                    m_context.arc(m_canvas.width / 2, m_canvas.height / 2, img.width / 2, 0, 2 * Math.PI, false);
-                    var radgrad = m_context.createRadialGradient(m_canvas.width / 2, m_canvas.height / 2, img.height / 3, m_canvas.width / 2, m_canvas.height / 2, img.height / 2);
-                    radgrad.addColorStop(0.9, '#F5F5DC');
-                    radgrad.addColorStop(0.1, '#cdc0b0');
-                    m_context.fillStyle = radgrad;
-                    m_context.fill();
-                    m_context.closePath();
-                    m_context.strokeStyle = 'rgba(200,0,0,0.7)'
-                    m_context.beginPath();
-                    m_context.moveTo(m_canvas.width / 2, m_canvas.height / 2 - 5);
-                    m_context.lineTo(m_canvas.width / 2, m_canvas.height / 2 - img.height / 2);
-                    m_context.closePath();
-                    m_context.stroke();
-                    m_context.beginPath();
-                    m_context.arc(m_canvas.width / 2, m_canvas.height / 3, img.height / 20, 0, 2 * Math.PI, false);
-                    m_context.lineWidth = 1.5;
-                    m_context.strokeStyle = 'rgba(128,0,0,0.9)';
-                    m_context.stroke();
-                    m_context.closePath();
-                    var xStart = (m_canvas.width - img.width) / 2;
-                    var yStart = (m_canvas.height - img.height) / 2;
-                    m_context.beginPath();
-                    m_context.arc(m_canvas.width / 2, m_canvas.height / 2, (img.height / 2) - 2, 0, 2 * Math.PI, false);
-                    m_context.lineWidth = 3.5;
-                    m_context.strokeStyle = 'rgba(0,0,0,0.5)';
-                    m_context.stroke();
-                    m_context.closePath();
-                    oCanvas = m_canvas;
+                    if (img != null && oCanvas == null) {
+                        var m_canvas = document.createElement('canvas');
+                        m_canvas.width = img.width;
+                        m_canvas.height = img.height;
+                        m_context = m_canvas.getContext('2d');
+                        m_context.beginPath();
+                        m_context.arc(m_canvas.width / 2, m_canvas.height / 2, img.width / 2, 0, 2 * Math.PI, false);
+                        var radgrad = m_context.createRadialGradient(m_canvas.width / 2, m_canvas.height / 2, img.height / 3, m_canvas.width / 2, m_canvas.height / 2, img.height / 2);
+                        radgrad.addColorStop(0.9, '#F5F5DC');
+                        radgrad.addColorStop(0.1, '#cdc0b0');
+                        m_context.fillStyle = radgrad;
+                        m_context.fill();
+                        m_context.closePath();
+                        m_context.strokeStyle = 'rgba(200,0,0,0.7)'
+                        m_context.beginPath();
+                        m_context.moveTo(m_canvas.width / 2, m_canvas.height / 2 - 5);
+                        m_context.lineTo(m_canvas.width / 2, m_canvas.height / 2 - img.height / 2);
+                        m_context.closePath();
+                        m_context.stroke();
+                        m_context.beginPath();
+                        m_context.arc(m_canvas.width / 2, m_canvas.height / 3, img.height / 20, 0, 2 * Math.PI, false);
+                        m_context.lineWidth = 1.5;
+                        m_context.strokeStyle = 'rgba(128,0,0,0.9)';
+                        m_context.stroke();
+                        m_context.closePath();
+                        var xStart = (m_canvas.width - img.width) / 2;
+                        var yStart = (m_canvas.height - img.height) / 2;
+                        m_context.beginPath();
+                        m_context.arc(m_canvas.width / 2, m_canvas.height / 2, (img.height / 2) - 2, 0, 2 * Math.PI, false);
+                        m_context.lineWidth = 3.5;
+                        m_context.strokeStyle = 'rgba(0,0,0,0.5)';
+                        m_context.stroke();
+                        m_context.closePath();
+                        oCanvas = m_canvas;
+                    }
                 }
-            }
-            //Run this function when the compass updates
+                //Run this function when the compass updates
+
             function runCompassUpdate() {
                 context.clearRect(0, 0, canvas.width, canvas.height);
                 var xStart = (canvas.width - img.width) / 2;
@@ -453,9 +503,9 @@ var app = {
             }
 
             function onError(compassError) {
-                alert('Compass error: ' + compassError.code);
-            }
-            //Setup the compass to read every 100ms
+                    alert('Compass error: ' + compassError.code);
+                }
+                //Setup the compass to read every 100ms
             var options = {
                 frequency: 100
             };
@@ -507,36 +557,37 @@ var app = {
             //Make sure the app is privileged and contain the 
             //proper contacts permission
             function createAndSaveContact() {
-                var fname = document.getElementById('fname').value;
-                var lname = document.getElementById('lname').value;
-                var email = document.getElementById('email').value;
+                    var fname = document.getElementById('fname').value;
+                    var lname = document.getElementById('lname').value;
+                    var email = document.getElementById('email').value;
 
-                function onSuccess(contact) {
-                    console.log("Save Success");
-                    flipMain();
-                };
+                    function onSuccess(contact) {
+                        console.log("Save Success");
+                        flipMain();
+                    };
 
-                function onError(contactError) {
-                    console.log("Add Error = " + contactError.code);
-                    flipMain();
-                };
+                    function onError(contactError) {
+                        console.log("Add Error = " + contactError.code);
+                        flipMain();
+                    };
 
-                // create a new contact object
-                var contact = navigator.contacts.create();
-                // populate some fields
-                var name = new ContactName();
-                name.givenName = fname;
-                name.familyName = lname;
-                contact.name = name;
-                var emails = [];
-                //Currently not working
-                emails[0] = new ContactField('Personal', email, false);
-                contact.emails = emails;
-                // save to device
-                contact.save(onSuccess, onError);
+                    // create a new contact object
+                    var contact = navigator.contacts.create();
+                    // populate some fields
+                    var name = new ContactName();
+                    name.givenName = fname;
+                    name.familyName = lname;
+                    contact.name = name;
+                    var emails = [];
+                    //Currently not working
+                    emails[0] = new ContactField('Personal', email, false);
+                    contact.emails = emails;
+                    // save to device
+                    contact.save(onSuccess, onError);
 
-            }
-            //Check to see if contact exists and if not create it
+                }
+                //Check to see if contact exists and if not create it
+
             function saveContact() {
                 var options = new ContactFindOptions();
                 options.filter = "";
@@ -552,25 +603,25 @@ var app = {
                 navigator.contacts.find(fields, onSuccess, onError, options);
 
                 function onSuccess(contacts) {
-                    if (contacts.length == 0) {
-                        createAndSaveContact();
-                        return;
-                    }
-                    for (var i = 0; i < contacts.length; i++) {
-                        //console.log("Name = " + contacts[i].name.givenName + "," + contacts[i].name.familyName + " emails " + contacts[i].emails);
-                        if (contacts[i].name.givenName == fname && contacts[i].name.familyName == lname) {
-                            //Contact exists already
-                            alert("name already added");
-                            flipMain();
+                        if (contacts.length == 0) {
+                            createAndSaveContact();
                             return;
                         }
+                        for (var i = 0; i < contacts.length; i++) {
+                            //console.log("Name = " + contacts[i].name.givenName + "," + contacts[i].name.familyName + " emails " + contacts[i].emails);
+                            if (contacts[i].name.givenName == fname && contacts[i].name.familyName == lname) {
+                                //Contact exists already
+                                alert("name already added");
+                                flipMain();
+                                return;
+                            }
+
+                        }
+                        //Does not exist add them
+                        createAndSaveContact();
 
                     }
-                    //Does not exist add them
-                    createAndSaveContact();
-
-                }
-                // onError: Failed to get the contacts
+                    // onError: Failed to get the contacts
 
                 function onError(contactError) {
                     alert('onError!');
@@ -585,6 +636,112 @@ var app = {
             var button2 = document.querySelector('x-flipbox .contactForm .save');
             button2.addEventListener('click', saveContact, false);
         }
+
+
+        //Run the file demo
+        function addFile() {
+            flipDemo('File API');
+            var fs;
+            var fEntry;
+            //var loading = document.createElement('div');
+            //loading.className = 'loading';
+            //loading.innerHTML = 'Creating File...';
+            //setOutput(loading);
+
+
+            function listDir(dirEntry) {
+                function success(entries) {
+                    var i;
+                    for (i = 0; i < entries.length; i++) {
+                        //var tn = document.createTextNode("TT:"+entries[i].fullPath);
+                        //var loading = document.createElement('pre');
+                        //loading.innerHTML = "Entry:"+entries[i].fullPath
+                        //appendOutput(loading);
+                        writeText("Entry:" + entries[i].fullPath);
+                        if (entries[i].isDirectory) {
+                            listDir(entries[i]);
+                        }
+                    }
+                }
+
+                var dirReader = dirEntry.createReader();
+                dirReader.readEntries(success, fail);
+            }
+
+
+
+
+            window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, gotFS, fail);
+
+
+            function gotFS(fileSystem) {
+                fs = fileSystem;
+                fileSystem.root.getFile("readme.txt", {
+                    create: true,
+                    exclusive: false
+                }, gotFileEntry, fail);
+            }
+
+            function gotFileEntry(fileEntry) {
+                writeText("readme.txt created");
+                fEntry = fileEntry;
+                fileEntry.createWriter(gotFileWriter, fail);
+            }
+
+            function gotFileWriter(writer) {
+                writer.onwriteend = function (evt) {
+                    writeText("Wrote text to readme.txt");
+
+                    //iterate over entries
+
+
+                    //create a directory
+                    fs.root.getDirectory('TestDir', {
+                        create: true
+                    }, gotDir, fail);
+                    writeText("Created TestDir");
+
+                    function gotDir(dirEntry) {
+                        fEntry.copyTo(dirEntry, 'copyreadme.txt', function () {
+                            writeText("Copied readme.txt to TestDir/copyreadme.txt");
+                            writeText("List Filesystem Contents");
+                            listDir(fs.root);
+                        }, fail);
+
+                    }
+                };
+                writer.write("Write Text");
+            }
+
+            function fail(error) {
+                console.log(error.code);
+            }
+        }
+
+        function openBrowser() {
+            flipDemo('InAppBrowser');
+            browserRef = window.open('https://developer.mozilla.org', '_blank', 'location=yes');
+            var el = document.querySelector(".inAppBrowserWrap");
+            setOutput(el);
+        }
+
+        function getNetInfo() {
+            flipDemo('Net Info');
+            var networkState = navigator.connection.type;
+
+            writeText('Connection type: ' + networkState);
+
+            document.addEventListener("offline", offline, false);
+            document.addEventListener("online", online, false);
+            netEvent = true;
+        }
+
+        function batteryStats() {
+            flipDemo('Battery Status');
+            window.addEventListener("batterystatus", onBatteryStatus, false);
+            batteryEvent = true;
+        }
+
 
         // Wire up events for all the navigation buttons on the main
         // page to run individual demos
@@ -602,5 +759,15 @@ var app = {
         button.addEventListener('click', runPro, false);
         button = document.getElementById('addNewContact');
         button.addEventListener('click', addNewContact, false);
+        button = document.getElementById('addNewFile');
+        button.addEventListener('click', addFile, false);
+        button = document.getElementById('inAppBrowser');
+        button.addEventListener('click', openBrowser, false);
+        button = document.getElementById('netInfo');
+        button.addEventListener('click', getNetInfo, false);
+        button = document.getElementById('batteryInfo');
+        button.addEventListener('click', batteryStats, false);
+
+
     }
 };

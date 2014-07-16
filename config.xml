@@ -9,4 +9,13 @@
     </author>
     <content src="index.html" />
     <access origin="*" />
+    
+    
+<platform name="firefoxos">
+     <icon src="www/img/wrench-icon-128.png" width="128" height="128" />
+
+     <permission name="contacts" access="readwrite" description="Required for accessing address book."
+                 privileged="true"/>
+</platform>    
+    
 </widget>
